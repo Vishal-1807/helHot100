@@ -50,18 +50,11 @@ export const createGameContainer = (config: GameContainerConfig): GameContainerR
     // Calculate container width within constraints
     let containerWidth: number;
 
-    // For small screens (mobile), use full width to eliminate margins
-    if (screenWidth <= 500) {
-      containerWidth = screenWidth;
-    } else {
-      // For larger screens, use 95% width with max constraint
-      containerWidth = Math.min(screenWidth * 0.95, maxWidth);
-    }
+    // Use full screen width for responsive design, respecting min/max constraints
+    containerWidth = Math.max(minWidth, Math.min(screenWidth, maxWidth));
 
-    // Ensure minimum width is respected
-    if (containerWidth < minWidth) {
-      containerWidth = Math.min(minWidth, screenWidth);
-    }
+    // For very large screens, we might want to limit the width to maintain proportions
+    // But since maxWidth is set to screen width in main.ts, this will use full width
 
     // Container height can be full screen height or adjusted as needed
     const containerHeight = screenHeight; // 2px margin top/bottom

@@ -12,36 +12,19 @@ export const createBetTab = (appWidth: number, appHeight: number) => {
   container.zIndex = 50;
 
   let currentStakeAmount = GlobalState.getStakeAmount();
+  let currentAppWidth = appWidth;
+  let currentAppHeight = appHeight;
 
-  const spacing = appWidth * 0.12
+  const spacing = appWidth * 0.025
 
   const betAmountTextY = GlobalState.smallScreen ? appHeight * 0.046 : appHeight * 0.037;
-
-  // Function to calculate Y position based on current game state
-  const calculateYPosition = () => {
-    if (GlobalState.smallScreen) {
-      if (GlobalState.getGameStarted()) {
-        // Small screen + Game started
-        return appHeight - UI_POS.SMALL_SCREEN_BET_TAB_Y_GAME_STARTED * appHeight;
-      } else {
-        // Small screen + Game not started
-        return appHeight - UI_POS.SMALL_SCREEN_BET_TAB_Y * appHeight;
-      }
-    } else if (GlobalState.getGameStarted()) {
-        // Normal screen + Game started
-        return appHeight - UI_POS.BET_TAB_Y_GAME_STARTED * appHeight;
-    } else {
-        // Normal screen + Game not started
-        return appHeight - UI_POS.BET_TAB_Y * appHeight;
-    }
-  };
 
   // Store button references for position updates
   let valueBarRef: any, minusButtonRef: any, plusButtonRef: any, betAmountTextRef: any;
 
   // Function to update button positions
   const updateButtonPositions = () => {
-    const y_pos = calculateYPosition();
+    const y_pos = appHeight * UI_POS.BET_TAB_Y;
     console.log(`BetTab: Updating positions to y=${y_pos} (gameStarted=${GlobalState.getGameStarted()})`);
 
     if (valueBarRef) valueBarRef.y = y_pos;
@@ -68,13 +51,50 @@ export const createBetTab = (appWidth: number, appHeight: number) => {
     recordUserActivity(ActivityTypes.BET_CHANGE);
   };
 
+  // Comprehensive resize method
+  const resize = (newWidth: number, newHeight: number) => {
+    currentAppWidth = newWidth;
+    currentAppHeight = newHeight;
+
+    const newSpacing = newWidth * 0.025;
+    const newBetAmountTextY = GlobalState.smallScreen ? newHeight * 0.046 : newHeight * 0.037;
+    const y_pos = newHeight * UI_POS.BET_TAB_Y;
+
+    // Update value bar using Button methods
+    if (valueBarRef) {
+      (valueBarRef as any).setPosition(newWidth * UI_POS.BET_TAB_X, y_pos);
+      (valueBarRef as any).setSize(Math.max(newWidth * UI_POS.VALUE_BAR_WIDTH, 70), Math.max(30, newHeight * 0.04));
+    }
+
+    // Update minus button using Button methods
+    if (minusButtonRef && valueBarRef) {
+      const valueBarPos = (valueBarRef as any).getPosition();
+      const valueBarSize = (valueBarRef as any).getSize();
+      (minusButtonRef as any).setPosition(valueBarPos.x - valueBarSize.width / 2 - newSpacing, y_pos);
+      (minusButtonRef as any).setSize(Math.max(30, newHeight * 0.04), Math.max(30, newHeight * 0.04));
+    }
+
+    // Update plus button using Button methods
+    if (plusButtonRef && valueBarRef) {
+      const valueBarPos = (valueBarRef as any).getPosition();
+      const valueBarSize = (valueBarRef as any).getSize();
+      (plusButtonRef as any).setPosition(valueBarPos.x + valueBarSize.width / 2 + newSpacing, y_pos);
+      (plusButtonRef as any).setSize(Math.max(30, newHeight * 0.04), Math.max(30, newHeight * 0.04));
+    }
+
+    // Update text position
+    if (betAmountTextRef) {
+      betAmountTextRef.setPosition(newWidth * 0.05, y_pos - newBetAmountTextY);
+    }
+  };
+
   // Calculate initial position
-  let y_pos = calculateYPosition();
+  let y_pos = appHeight * UI_POS.BET_TAB_Y;
 
   const valueBar = createButton({
-    x: appWidth / 2,
+    x: appWidth * UI_POS.BET_TAB_X,
     y: y_pos,
-    width: appWidth * 0.60,
+    width: Math.max(appWidth * UI_POS.VALUE_BAR_WIDTH, 70),
     height: Math.max(30, appHeight * 0.04),
     color: UI_THEME.BET_VALUEBAR,
     borderColor: UI_THEME.BET_TAB_BORDERCOLOR,
@@ -93,7 +113,7 @@ export const createBetTab = (appWidth: number, appHeight: number) => {
   valueBarRef = valueBar;
 
   const minusButton = createButton({
-    x: spacing,
+    x: valueBar.x - valueBar.width / 2 - spacing,
     y: y_pos,
     width: Math.max(30, appHeight * 0.04),
     height: Math.max(30, appHeight * 0.04),
@@ -114,7 +134,7 @@ export const createBetTab = (appWidth: number, appHeight: number) => {
   minusButtonRef = minusButton;
 
   const plusButton = createButton({
-    x: appWidth - spacing,
+    x: valueBar.x + valueBar.width / 2 + spacing,
     y: y_pos,
     width: Math.max(30, appHeight * 0.04),
     height: Math.max(30, appHeight * 0.04),
@@ -157,6 +177,9 @@ export const createBetTab = (appWidth: number, appHeight: number) => {
   container.addChild(valueBar);
   container.addChild(minusButton);
   container.addChild(plusButton);
+
+  // Add resize method to container for external access
+  (container as any).resize = resize;
 
   return container;
 };

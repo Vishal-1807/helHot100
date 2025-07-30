@@ -10,8 +10,7 @@ import { SoundManager } from './utils/SoundManager';
 // import { initializeSettingsPopupManager, getSettingsPopupManager } from './components/popups/SettingsPopupManager';
 import { createGameContainer } from './components/gameContainer';
 import {UI_THEME} from './components/constants/UIThemeColors';
-// import { createBetButton, createGridSizesTab, createBetTab, createMinesTab, 
-//           createGrid, createTopBar, createCashoutButton, createPickRandomButton } from './components';
+import { createBetTab, createBalanceTab } from './components/';
 import {
   createSimplePositionedContainer,
   createStyledPositionedContainer,
@@ -107,6 +106,9 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
 
   // STEP 3: Initialize game UI components
   let gameContainer: any = null;
+  // Store container references for resize updates
+  let topBar: any, gameBoard: any, bottomBar: any;
+  let betTab: any, balanceTab: any;
   const initializeGameUI = (): void => {
     console.log('🎮 STEP 3: Initializing game UI...');
 
@@ -115,8 +117,8 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
 
     gameContainer = createGameContainer({
       app,
-      minWidth: app.screen.width,
-      maxWidth: app.screen.width,
+      minWidth: 340, // Minimum width for mobile
+      maxWidth: Math.max(app.screen.width, 1920), // Allow scaling up to at least 1920px or screen width
       backgroundColor: '#1A2C38'
     });
 
@@ -150,49 +152,56 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
     const bounds = gameContainer.getGameAreaBounds();
     console.log('📐 Game area bounds:', bounds);
 
-    const topBar = createSimplePositionedContainer({
+    topBar = createSimplePositionedContainer({
       gameContainerWidth: bounds.width,
       gameContainerHeight: bounds.height,
       height: '10%',
       topPercentage: 0,
       backgroundColor: '#1A2C38',
-      transparent: false,
+      transparent: true,
       // backgroundTexture: Assets.get('topBar'),
       // textureFit: 'cover'
     });
 
     gameContainer.gameArea.addChild(topBar.container);
 
-    const gameBoard = createSimplePositionedContainer({
+    gameBoard = createSimplePositionedContainer({
       gameContainerWidth: bounds.width,
       gameContainerHeight: bounds.height,
       height: '75%',
       topPercentage: 10,
       backgroundColor: '#4EC9B0',
-      transparent: false,
+      transparent: true,
       // backgroundTexture: Assets.get('gameBoard'),
       // textureFit: 'cover'
     });
 
     gameContainer.gameArea.addChild(gameBoard.container);
 
-    const bottomBar = createSimplePositionedContainer({
+    bottomBar = createSimplePositionedContainer({
       gameContainerWidth: bounds.width,
       gameContainerHeight: bounds.height,
       height: '15%',
       topPercentage: 85,
       backgroundColor: '#1A2C38',
-      transparent: false,
+      transparent: true,
       // backgroundTexture: Assets.get('bottomBar'),
       // textureFit: 'cover'
     });
 
     gameContainer.gameArea.addChild(bottomBar.container);
 
+    addContentToContainers(topBar, gameBoard, bottomBar);
+
   };
 
-  const addContentToContainers = (header: any, gameBoard: any, controls: any) => {
-    
+  const addContentToContainers = (topBarRef: any, gameBoardRef: any, bottomBarRef: any) => {
+    // Create and store tab references
+    betTab = createBetTab(bottomBarRef.container.width, bottomBarRef.container.height);
+    balanceTab = createBalanceTab(bottomBarRef.container.width, bottomBarRef.container.height);
+
+    bottomBarRef.container.addChild(betTab);
+    bottomBarRef.container.addChild(balanceTab);
   };
 
   // STEP 4: Remove splash screen
@@ -287,16 +296,10 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
       // Update background sprite scaling and positioning
       if ((gameContainer as any).backgroundSprite) {
         const bgSprite = (gameContainer as any).backgroundSprite;
-        const bgTexture = bgSprite.texture;
 
-        // Set background width to gameContainer width and height to screen height
-        const targetWidth = bounds.width;
-        const targetHeight = newHeight; // Use screen height
-
-        const scaleX = targetWidth / bgTexture.width;
-        const scaleY = targetHeight / bgTexture.height;
-
-        // bgSprite.scale.set(scaleX, scaleY);
+        // Update background size to match new container bounds
+        bgSprite.width = bounds.width;
+        bgSprite.height = newHeight;
 
         // Position at top-left
         bgSprite.x = 0;
@@ -304,6 +307,25 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
       }
 
       // Update positioned containers
+      if (topBar && typeof topBar.updateDimensions === 'function') {
+        topBar.updateDimensions(bounds.width, bounds.height);
+      }
+      if (gameBoard && typeof gameBoard.updateDimensions === 'function') {
+        gameBoard.updateDimensions(bounds.width, bounds.height);
+      }
+      if (bottomBar && typeof bottomBar.updateDimensions === 'function') {
+        bottomBar.updateDimensions(bounds.width, bounds.height);
+      }
+
+      // Update tabs with new container dimensions
+      if (betTab && typeof (betTab as any).resize === 'function') {
+        (betTab as any).resize(bottomBar.container.width, bottomBar.container.height);
+      }
+      if (balanceTab && typeof (balanceTab as any).resize === 'function') {
+        (balanceTab as any).resize(bottomBar.container.width, bottomBar.container.height);
+      }
+
+      // Legacy container support (keeping for compatibility)
       if ((gameContainer as any).headerContainer) {
         (gameContainer as any).headerContainer.updateDimensions(bounds.width, bounds.height);
       }
