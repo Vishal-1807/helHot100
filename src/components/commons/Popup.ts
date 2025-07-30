@@ -228,6 +228,7 @@ const createPopup = ({
           console.log(`🔧 Icon for ${buttonConfig.label}: scale=${scale}, size=${buttonIcon.width}x${buttonIcon.height}`);
           
         } catch (error) {
+          console.log(new Error(error).message);
           console.warn(`Button texture '${buttonConfig.texture}' not found`);
           buttonIcon = null;
         }

@@ -7,15 +7,14 @@ type WSMessage = { event: string; data: any };
 export class WebSocketService {
   private static instance: WebSocketService;
   private socket: WebSocket | null = null;
-  private listeners = new Map<string, (data: any) => void>();
-  private queue: WSMessage[] = [];
-  private reconnectDelay = 1000;
+  private readonly listeners = new Map<string, (data: any) => void>();
+  private readonly queue: WSMessage[] = [];
+  private readonly reconnectDelay = 1000;
   private isConnected = false;
 
   // Get the URL with the current token from GlobalState
   private getWebSocketUrl(): string {
     const token = REACT_MODE ? GlobalState.getToken() : gametoken;
-    // return `${GlobalState.getWebSocketUrl()}/user/auth?authorization=Bearer ${token}`;
     return REACT_MODE ? `${GlobalState.getWebSocketUrl()}/user/auth?authorization=Bearer ${token}` : `wss://backend.inferixai.link/user/auth?authorization=Bearer ${token}`;
   }
 
@@ -72,7 +71,7 @@ export class WebSocketService {
           this.listeners.get(eventKey)?.(msg.data || msg); // Pass data or full message if data is not available
         }
       } catch (e) {
-        console.error('Invalid message:', event.data);
+        console.log('Invalid message:', new Error(event.data));
       }
     };
 

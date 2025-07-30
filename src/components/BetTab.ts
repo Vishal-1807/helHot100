@@ -11,7 +11,6 @@ export const createBetTab = (appWidth: number, appHeight: number) => {
   const container = new Container();
   container.zIndex = 50;
 
-  const betSteps = GlobalState.getBetSteps();
   let currentStakeAmount = GlobalState.getStakeAmount();
 
   const spacing = appWidth * 0.12
@@ -28,14 +27,12 @@ export const createBetTab = (appWidth: number, appHeight: number) => {
         // Small screen + Game not started
         return appHeight - UI_POS.SMALL_SCREEN_BET_TAB_Y * appHeight;
       }
-    } else {
-      if (GlobalState.getGameStarted()) {
+    } else if (GlobalState.getGameStarted()) {
         // Normal screen + Game started
         return appHeight - UI_POS.BET_TAB_Y_GAME_STARTED * appHeight;
-      } else {
+    } else {
         // Normal screen + Game not started
         return appHeight - UI_POS.BET_TAB_Y * appHeight;
-      }
     }
   };
 
@@ -62,7 +59,7 @@ export const createBetTab = (appWidth: number, appHeight: number) => {
   // Function to update the value bar label
   const updateValueBarLabel = () => {
     currentStakeAmount = GlobalState.getStakeAmount();
-    if (valueBarRef && valueBarRef.children && valueBarRef.children[2]) { // Text is typically the third child
+    if (valueBarRef?.children && valueBarRef?.children[2]) { // Text is typically the third child
       const textChild = valueBarRef.children[2] as any;
       if (textChild.text !== undefined) {
         textChild.text = `${currentStakeAmount}`;
