@@ -1,5 +1,4 @@
-import { AnimatedSprite, Texture, Spritesheet, Application } from "pixi.js";
-import { Assets } from "pixi.js";
+import { AnimatedSprite, Texture, Spritesheet, Application, Assets } from "pixi.js";
 
 // Define the SpriteOptions type
 type SpriteOptions = {

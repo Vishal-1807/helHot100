@@ -59,8 +59,8 @@ export const createBetTab = (appWidth: number, appHeight: number) => {
   // Function to update the value bar label
   const updateValueBarLabel = () => {
     currentStakeAmount = GlobalState.getStakeAmount();
-    if (valueBarRef?.children && valueBarRef?.children[2]) { // Text is typically the third child
-      const textChild = valueBarRef.children[2] as any;
+    if (valueBarRef?.children?.[2]) { // Text is typically the third child
+      const textChild = valueBarRef.children[2];
       if (textChild.text !== undefined) {
         textChild.text = `${currentStakeAmount}`;
       }

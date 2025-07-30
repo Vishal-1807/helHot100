@@ -301,7 +301,6 @@ export const createPositionedContainer = (config: PositionedContainerConfig): Po
   };
 
   const setTextureScale = (s: number) => {
-    // textureScale = s;
     const bounds = mainContainer.parent?.getBounds();
     if (bounds) updatePosition(bounds.width, bounds.height);
   };
