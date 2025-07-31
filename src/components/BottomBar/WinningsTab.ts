@@ -1,18 +1,15 @@
 import { Assets, Container } from 'pixi.js';
-import { createButton } from './commons/Button';
-import { GlobalState } from '../globals/gameState'; 
-import { UI_THEME } from './constants/UIThemeColors';
-import { UI_POS } from './constants/Positions';
-import { SoundManager } from '../utils/SoundManager';
-import { ActivityTypes, recordUserActivity } from '../utils/gameActivityManager';
+import { createButton } from '../commons/Button';
+import { GlobalState } from '../../globals/gameState'; 
+import { UI_THEME } from '../constants/UIThemeColors';
+import { UI_POS } from '../constants/Positions';
+import { SoundManager } from '../../utils/SoundManager';
+import { ActivityTypes, recordUserActivity } from '../../utils/gameActivityManager';
 
 
 export const createWinningsTab = (appWidth: number, appHeight: number) => {
   const container = new Container();
   container.zIndex = 50;
-
-  let currentAppWidth = appWidth;
-  let currentAppHeight = appHeight;
 
   const balanceTextY = appHeight * 0.046;
 
@@ -36,8 +33,6 @@ export const createWinningsTab = (appWidth: number, appHeight: number) => {
 
   // Resize method
   const resize = (newWidth: number, newHeight: number) => {
-    currentAppWidth = newWidth;
-    currentAppHeight = newHeight;
 
     // Update button position using setPosition method
     (winningsButton as any).setPosition(newWidth * UI_POS.WINNINGS_TAB_X, newHeight * UI_POS.WINNINGS_TAB_Y);

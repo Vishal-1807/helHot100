@@ -1,16 +1,13 @@
 import { Container, Assets } from 'pixi.js';
-import { createButton } from './commons/Button';
-import { UI_POS } from './constants/Positions';
-import { UI_THEME } from './constants/UIThemeColors';
-import { SoundManager } from '../utils/SoundManager';
-import { ActivityTypes, recordUserActivity } from '../utils/gameActivityManager';
+import { createButton } from '../commons/Button';
+import { UI_POS } from '../constants/Positions';
+import { UI_THEME } from '../constants/UIThemeColors';
+import { SoundManager } from '../../utils/SoundManager';
+import { ActivityTypes, recordUserActivity } from '../../utils/gameActivityManager';
 
-export const createSpinButton = (appWidth: number, appHeight: number, onClick: () => void): Container => {
+export const createSpinButton = (appWidth: number, appHeight: number): Container => {
   const container = new Container();
   container.zIndex = 50;
-
-  let currentAppWidth = appWidth;
-  let currentAppHeight = appHeight;
 
   let spinButtonRef: any;
 
@@ -29,8 +26,6 @@ export const createSpinButton = (appWidth: number, appHeight: number, onClick: (
   spinButtonRef = spinButton;
 
   const resize = (newWidth: number, newHeight: number) => {
-    currentAppWidth = newWidth;
-    currentAppHeight = newHeight;
 
     if(!spinButtonRef) return;
     // Update button position using setPosition method

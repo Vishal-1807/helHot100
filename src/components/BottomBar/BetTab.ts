@@ -1,19 +1,17 @@
 import { Assets, Container } from 'pixi.js';
-import { createButton } from './commons/Button';
-import { GlobalState } from '../globals/gameState';
-import { UI_THEME } from './constants/UIThemeColors';
-import { UI_POS } from './constants/Positions';
-import { addButtonReferences } from '../utils/gameButtonStateManager';
-import { ActivityTypes, recordUserActivity } from '../utils/gameActivityManager';
-import { SoundManager } from '../utils/SoundManager';
+import { createButton } from '../commons/Button';
+import { GlobalState } from '../../globals/gameState';
+import { UI_THEME } from '../constants/UIThemeColors';
+import { UI_POS } from '../constants/Positions';
+import { addButtonReferences } from '../../utils/gameButtonStateManager';
+import { ActivityTypes, recordUserActivity } from '../../utils/gameActivityManager';
+import { SoundManager } from '../../utils/SoundManager';
 
 export const createBetTab = (appWidth: number, appHeight: number) => {
   const container = new Container();
   container.zIndex = 50;
 
   let currentStakeAmount = GlobalState.getStakeAmount();
-  let currentAppWidth = appWidth;
-  let currentAppHeight = appHeight;
 
   const spacing = appWidth * 0.025
 
@@ -53,8 +51,6 @@ export const createBetTab = (appWidth: number, appHeight: number) => {
 
   // Comprehensive resize method
   const resize = (newWidth: number, newHeight: number) => {
-    currentAppWidth = newWidth;
-    currentAppHeight = newHeight;
 
     const newSpacing = newWidth * 0.025;
     const newBetAmountTextY = GlobalState.smallScreen ? newHeight * 0.046 : newHeight * 0.037;
@@ -63,7 +59,7 @@ export const createBetTab = (appWidth: number, appHeight: number) => {
     // Update value bar using Button methods
     if (valueBarRef) {
       (valueBarRef as any).setPosition(newWidth * UI_POS.BET_TAB_X, y_pos);
-      (valueBarRef as any).setSize(Math.max(newWidth * UI_POS.VALUE_BAR_WIDTH, 100), UI_POS.BET_TAB_MIN_HEIGHT);
+      (valueBarRef as any).setSize(Math.max(newWidth * UI_POS.VALUE_BAR_WIDTH, 100), Math.max(newHeight * UI_POS.BET_TAB_MAX_HEIGHT_RATIO, UI_POS.BET_TAB_MIN_HEIGHT));
     }
 
     // Update minus button using Button methods

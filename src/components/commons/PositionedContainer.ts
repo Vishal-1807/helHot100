@@ -3,10 +3,13 @@ import { Container, Graphics, FederatedPointerEvent, Texture, Sprite } from 'pix
 interface PositionedContainerConfig {
   gameContainerWidth: number;
   gameContainerHeight: number;
-  height: number | string;
-  topPercentage: number;
+  width?: number | string; // Added width option
+  height?: number | string; // Made height optional
+  x?: number | string;
+  y?: number | string;
+  anchor?: { x: number; y: number };
   backgroundColor?: number | string;
-  transparent?: boolean; // Added transparent option
+  transparent?: boolean;
   borderColor?: number | string;
   borderWidth?: number;
   borderRadius?: number;
@@ -28,8 +31,10 @@ export interface PositionedContainerResult {
   backgroundSprite?: Sprite;
   updatePosition: (w: number, h: number) => void;
   updateDimensions: (w: number, h: number) => void;
+  setWidth: (w: number | string) => void; // Added to set width
   setHeight: (h: number | string) => void;
-  setTopPercentage: (p: number) => void;
+  setPosition: (x: number | string, y: number | string) => void;
+  setAnchor: (anchor: { x: number; y: number }) => void;
   getActualBounds: () => { x: number; y: number; width: number; height: number };
   setBackgroundTexture?: (t: Texture | null, f?: 'stretch' | 'cover' | 'contain' | 'tile' | 'center') => void;
   setTextureScale?: (s: number) => void;
@@ -51,9 +56,13 @@ const parseColor = (color: number | string | undefined): number => {
 export const createPositionedContainer = (config: PositionedContainerConfig): PositionedContainerResult => {
   const {
     gameContainerWidth, gameContainerHeight,
-    height, topPercentage,
+    width = '100%', // Default to 100%
+    height = '100%', // Default to 100%
+    x = 0,
+    y = 0,
+    anchor = { x: 0, y: 0 },
     backgroundColor = 0x1A2C38,
-    transparent = false, // Default to false
+    transparent = false,
     borderColor, borderWidth = 0, borderRadius = 0,
     opacity = 1, marginLeft = 0, marginRight = 0,
     backgroundTexture, textureScale = 1, textureFit = 'stretch',
@@ -101,9 +110,19 @@ export const createPositionedContainer = (config: PositionedContainerConfig): Po
     mainContainer.cursor = 'pointer';
   }
 
+  let currentWidth = width;
   let currentHeight = height;
-  let currentTop = topPercentage;
+  let currentX = x;
+  let currentY = y;
+  let currentAnchor = anchor;
   let currentTextureFit = textureFit;
+
+  const calculateActualWidth = (gw: number): number => {
+    if (typeof currentWidth === 'string' && currentWidth.endsWith('%')) {
+      return (gw * parseFloat(currentWidth)) / 100;
+    }
+    return typeof currentWidth === 'number' ? currentWidth : parseFloat(currentWidth.toString());
+  };
 
   const calculateActualHeight = (gh: number): number => {
     if (typeof currentHeight === 'string' && currentHeight.endsWith('%')) {
@@ -112,10 +131,24 @@ export const createPositionedContainer = (config: PositionedContainerConfig): Po
     return typeof currentHeight === 'number' ? currentHeight : parseFloat(currentHeight.toString());
   };
 
+  const calculateActualX = (gw: number): number => {
+    if (typeof currentX === 'string' && currentX.endsWith('%')) {
+      return (gw * parseFloat(currentX)) / 100;
+    }
+    return typeof currentX === 'number' ? currentX : parseFloat(currentX.toString());
+  };
+
+  const calculateActualY = (gh: number): number => {
+    if (typeof currentY === 'string' && currentY.endsWith('%')) {
+      return (gh * parseFloat(currentY)) / 100;
+    }
+    return typeof currentY === 'number' ? currentY : parseFloat(currentY.toString());
+  };
+
   const updateBackgroundTexture = (cw: number, ch: number) => {
     if (!backgroundSprite) return;
 
-    const aw = cw - marginLeft - marginRight;
+    const aw = calculateActualWidth(cw) - marginLeft - marginRight;
     const ah = calculateActualHeight(ch);
     const pad = borderWidth;
     const tw = aw - pad * 2;
@@ -158,12 +191,12 @@ export const createPositionedContainer = (config: PositionedContainerConfig): Po
   };
 
   const drawBackground = (cw: number, ch: number) => {
-    const aw = cw - marginLeft - marginRight;
+    const aw = calculateActualWidth(cw) - marginLeft - marginRight;
     const ah = calculateActualHeight(ch);
     background.clear();
     updateBackgroundTexture(cw, ch);
 
-    const useTrans = transparent || !!backgroundSprite; // Transparent if explicitly set or texture is used
+    const useTrans = transparent || !!backgroundSprite;
     const fillColor = useTrans ? { color: 0x000000, alpha: 0 } : { color: parseColor(backgroundColor), alpha: opacity };
 
     if (borderWidth > 0 && borderColor !== undefined) {
@@ -209,7 +242,7 @@ export const createPositionedContainer = (config: PositionedContainerConfig): Po
 
     const getBounds = () => {
       const ah = calculateActualHeight(gameContainerHeight);
-      const aw = gameContainerWidth - marginLeft - marginRight;
+      const aw = calculateActualWidth(gameContainerWidth) - marginLeft - marginRight;
       return { width: aw, height: ah };
     };
 
@@ -261,8 +294,14 @@ export const createPositionedContainer = (config: PositionedContainerConfig): Po
   };
 
   const updatePosition = (cw: number, ch: number) => {
-    mainContainer.x = marginLeft;
-    mainContainer.y = (ch * currentTop) / 100;
+    const aw = calculateActualWidth(cw) - marginLeft - marginRight;
+    const ah = calculateActualHeight(ch);
+    const ax = calculateActualX(cw);
+    const ay = calculateActualY(ch);
+
+    mainContainer.pivot.set(aw * currentAnchor.x, ah * currentAnchor.y);
+    mainContainer.x = ax + marginLeft;
+    mainContainer.y = ay;
     drawBackground(cw, ch);
     contentArea.x = borderWidth;
     contentArea.y = borderWidth;
@@ -270,14 +309,27 @@ export const createPositionedContainer = (config: PositionedContainerConfig): Po
 
   const updateDimensions = updatePosition;
 
+  const setWidth = (w: number | string) => {
+    currentWidth = w;
+    const bounds = mainContainer.parent?.getBounds();
+    if (bounds) updatePosition(bounds.width, bounds.height);
+  };
+
   const setHeight = (h: number | string) => {
     currentHeight = h;
     const bounds = mainContainer.parent?.getBounds();
     if (bounds) updatePosition(bounds.width, bounds.height);
   };
 
-  const setTopPercentage = (p: number) => {
-    currentTop = Math.min(100, Math.max(0, p));
+  const setPosition = (newX: number | string, newY: number | string) => {
+    currentX = newX;
+    currentY = newY;
+    const bounds = mainContainer.parent?.getBounds();
+    if (bounds) updatePosition(bounds.width, bounds.height);
+  };
+
+  const setAnchor = (newAnchor: { x: number; y: number }) => {
+    currentAnchor = newAnchor;
     const bounds = mainContainer.parent?.getBounds();
     if (bounds) updatePosition(bounds.width, bounds.height);
   };
@@ -306,11 +358,14 @@ export const createPositionedContainer = (config: PositionedContainerConfig): Po
   };
 
   const getActualBounds = () => {
+    const aw = calculateActualWidth(gameContainerWidth) - marginLeft - marginRight;
     const ah = calculateActualHeight(gameContainerHeight);
+    const ax = calculateActualX(gameContainerWidth);
+    const ay = calculateActualY(gameContainerHeight);
     return {
-      x: mainContainer.x,
-      y: mainContainer.y,
-      width: gameContainerWidth - marginLeft - marginRight,
+      x: ax - aw * currentAnchor.x,
+      y: ay - ah * currentAnchor.y,
+      width: aw,
       height: ah
     };
   };
@@ -325,8 +380,10 @@ export const createPositionedContainer = (config: PositionedContainerConfig): Po
     backgroundSprite,
     updatePosition,
     updateDimensions,
+    setWidth,
     setHeight,
-    setTopPercentage,
+    setPosition,
+    setAnchor,
     getActualBounds,
     setBackgroundTexture,
     setTextureScale
@@ -348,7 +405,7 @@ export const createPositionedContainer = (config: PositionedContainerConfig): Po
   return result;
 };
 
-// Updated helper functions with named parameters and transparent option
+// Updated helper functions with width, x, y, and anchor options
 
 /**
  * Creates a simple positioned container with minimal styling and optional texture
@@ -356,8 +413,11 @@ export const createPositionedContainer = (config: PositionedContainerConfig): Po
 export const createSimplePositionedContainer = ({
   gameContainerWidth,
   gameContainerHeight,
-  height,
-  topPercentage,
+  width = '100%',
+  height = '100%',
+  x = 0,
+  y = 0,
+  anchor = { x: 0, y: 0 },
   backgroundColor = 0x1A2C38,
   transparent = false,
   backgroundTexture,
@@ -365,8 +425,11 @@ export const createSimplePositionedContainer = ({
 }: {
   gameContainerWidth: number;
   gameContainerHeight: number;
-  height: number | string;
-  topPercentage: number;
+  width?: number | string;
+  height?: number | string;
+  x?: number | string;
+  y?: number | string;
+  anchor?: { x: number; y: number };
   backgroundColor?: number | string;
   transparent?: boolean;
   backgroundTexture?: Texture;
@@ -375,8 +438,11 @@ export const createSimplePositionedContainer = ({
   return createPositionedContainer({
     gameContainerWidth,
     gameContainerHeight,
+    width,
     height,
-    topPercentage,
+    x,
+    y,
+    anchor,
     backgroundColor,
     transparent,
     backgroundTexture,
@@ -390,8 +456,11 @@ export const createSimplePositionedContainer = ({
 export const createStyledPositionedContainer = ({
   gameContainerWidth,
   gameContainerHeight,
-  height,
-  topPercentage,
+  width = '100%',
+  height = '100%',
+  x = 0,
+  y = 0,
+  anchor = { x: 0, y: 0 },
   backgroundColor = 0x1A2C38,
   transparent = false,
   borderColor = 0x304553,
@@ -402,8 +471,11 @@ export const createStyledPositionedContainer = ({
 }: {
   gameContainerWidth: number;
   gameContainerHeight: number;
-  height: number | string;
-  topPercentage: number;
+  width?: number | string;
+  height?: number | string;
+  x?: number | string;
+  y?: number | string;
+  anchor?: { x: number; y: number };
   backgroundColor?: number | string;
   transparent?: boolean;
   borderColor?: number | string;
@@ -415,8 +487,11 @@ export const createStyledPositionedContainer = ({
   return createPositionedContainer({
     gameContainerWidth,
     gameContainerHeight,
+    width,
     height,
-    topPercentage,
+    x,
+    y,
+    anchor,
     backgroundColor,
     transparent,
     borderColor,
@@ -433,8 +508,11 @@ export const createStyledPositionedContainer = ({
 export const createMarginedPositionedContainer = ({
   gameContainerWidth,
   gameContainerHeight,
-  height,
-  topPercentage,
+  width = '100%',
+  height = '100%',
+  x = 0,
+  y = 0,
+  anchor = { x: 0, y: 0 },
   marginHorizontal = 10,
   backgroundColor = 0x1A2C38,
   transparent = false,
@@ -443,8 +521,11 @@ export const createMarginedPositionedContainer = ({
 }: {
   gameContainerWidth: number;
   gameContainerHeight: number;
-  height: number | string;
-  topPercentage: number;
+  width?: number | string;
+  height?: number | string;
+  x?: number | string;
+  y?: number | string;
+  anchor?: { x: number; y: number };
   marginHorizontal?: number;
   backgroundColor?: number | string;
   transparent?: boolean;
@@ -454,8 +535,11 @@ export const createMarginedPositionedContainer = ({
   return createPositionedContainer({
     gameContainerWidth,
     gameContainerHeight,
+    width,
     height,
-    topPercentage,
+    x,
+    y,
+    anchor,
     backgroundColor,
     transparent,
     marginLeft: marginHorizontal,
@@ -471,8 +555,11 @@ export const createMarginedPositionedContainer = ({
 export const createScrollablePositionedContainer = ({
   gameContainerWidth,
   gameContainerHeight,
-  height,
-  topPercentage,
+  width = '100%',
+  height = '100%',
+  x = 0,
+  y = 0,
+  anchor = { x: 0, y: 0 },
   scrollHeight,
   backgroundColor = 0x1A2C38,
   transparent = false,
@@ -485,8 +572,11 @@ export const createScrollablePositionedContainer = ({
 }: {
   gameContainerWidth: number;
   gameContainerHeight: number;
-  height: number | string;
-  topPercentage: number;
+  width?: number | string;
+  height?: number | string;
+  x?: number | string;
+  y?: number | string;
+  anchor?: { x: number; y: number };
   scrollHeight: number;
   backgroundColor?: number | string;
   transparent?: boolean;
@@ -500,8 +590,11 @@ export const createScrollablePositionedContainer = ({
   return createPositionedContainer({
     gameContainerWidth,
     gameContainerHeight,
+    width,
     height,
-    topPercentage,
+    x,
+    y,
+    anchor,
     backgroundColor,
     transparent,
     borderColor,
@@ -520,8 +613,11 @@ export const createScrollablePositionedContainer = ({
 export const createTexturedPositionedContainer = ({
   gameContainerWidth,
   gameContainerHeight,
-  height,
-  topPercentage,
+  width = '100%',
+  height = '100%',
+  x = 0,
+  y = 0,
+  anchor = { x: 0, y: 0 },
   backgroundTexture,
   textureFit = 'contain',
   textureScale = 1,
@@ -532,8 +628,11 @@ export const createTexturedPositionedContainer = ({
 }: {
   gameContainerWidth: number;
   gameContainerHeight: number;
-  height: number | string;
-  topPercentage: number;
+  width?: number | string;
+  height?: number | string;
+  x?: number | string;
+  y?: number | string;
+  anchor?: { x: number; y: number };
   backgroundTexture: Texture;
   textureFit?: 'stretch' | 'cover' | 'contain' | 'tile' | 'center';
   textureScale?: number;
@@ -545,8 +644,11 @@ export const createTexturedPositionedContainer = ({
   return createPositionedContainer({
     gameContainerWidth,
     gameContainerHeight,
+    width,
     height,
-    topPercentage,
+    x,
+    y,
+    anchor,
     backgroundTexture,
     textureFit,
     textureScale,

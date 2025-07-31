@@ -1,17 +1,14 @@
 import { Assets, Container } from 'pixi.js';
-import { createButton } from './commons/Button';
-import { GlobalState } from '../globals/gameState'; 
-import { UI_THEME } from './constants/UIThemeColors';
-import { UI_POS } from './constants/Positions';
-import { SoundManager } from '../utils/SoundManager';
-import { ActivityTypes, recordUserActivity } from '../utils/gameActivityManager';
+import { createButton } from '../commons/Button';
+import { GlobalState } from '../../globals/gameState'; 
+import { UI_THEME } from '../constants/UIThemeColors';
+import { UI_POS } from '../constants/Positions';
+import { SoundManager } from '../../utils/SoundManager';
+import { ActivityTypes, recordUserActivity } from '../../utils/gameActivityManager';
 
 export const createBalanceTab = (appWidth: number, appHeight: number) => {
   const container = new Container();
   container.zIndex = 50;
-
-  let currentAppWidth = appWidth;
-  let currentAppHeight = appHeight;
 
   const balanceTab = createButton({
     x: appWidth * UI_POS.BALANCE_TAB_X,
@@ -31,9 +28,13 @@ export const createBalanceTab = (appWidth: number, appHeight: number) => {
     },
   });
 
+  const updateBalance = (balance: number) => {
+    (balanceTab as any).setLabel(balance.toFixed(2).toString());
+  };
+
+  GlobalState.addBalanceChangeListener(updateBalance);
+
   const resize = (newWidth: number, newHeight: number) => {
-    currentAppWidth = newWidth;
-    currentAppHeight = newHeight;
 
     if(!balanceTab) return;
     // Update button position using setPosition method

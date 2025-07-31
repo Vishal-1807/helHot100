@@ -10,11 +10,10 @@ import { SoundManager } from './utils/SoundManager';
 // import { initializeSettingsPopupManager, getSettingsPopupManager } from './components/popups/SettingsPopupManager';
 import { createGameContainer } from './components/gameContainer';
 import {UI_THEME} from './components/constants/UIThemeColors';
-import { createBetTab, createWinningsTab, createSpinButton, createBalanceTab } from './components/';
+import { createBetTab, createWinningsTab, createSpinButton, createBalanceTab, 
+  createAutoSpinButton, createHomeButton, createSettingsButton, createRulesButton, createReelContainer } from './components/';
 import {
   createSimplePositionedContainer,
-  createStyledPositionedContainer,
-  createScrollablePositionedContainer
 } from './components/commons/PositionedContainer';
 import {REACT_MODE} from './components/constants/ReactMode';
 
@@ -110,10 +109,13 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
   let topBar: any, gameBoard: any, bottomBar: any;
 
   //top bar
-  let balanceTab: any;
+  let balanceTab: any, homeButton: any, settingsButton: any, rulesButton: any;
+
+  //reel container
+  let reelContainer: any;
 
   //bottom bar
-  let betTab: any, winningsTab: any, spinButton: any;
+  let betTab: any, winningsTab: any, spinButton: any, autoSpinButton: any;
 
   const initializeGameUI = (): void => {
     console.log('🎮 STEP 3: Initializing game UI...');
@@ -162,7 +164,9 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
       gameContainerWidth: bounds.width,
       gameContainerHeight: bounds.height,
       height: '15%',
-      topPercentage: 0,
+      x: 0,
+      y: '0%',
+      anchor: { x: 0, y: 0 },
       backgroundColor: '#1A2C38',
       transparent: true,
       // backgroundTexture: Assets.get('topBar'),
@@ -174,8 +178,10 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
     gameBoard = createSimplePositionedContainer({
       gameContainerWidth: bounds.width,
       gameContainerHeight: bounds.height,
-      height: '75%',
-      topPercentage: 15,
+      height: '70%',
+      x: 0,
+      y: '15%',
+      anchor: { x: 0, y: 0 },
       backgroundColor: '#4EC9B0',
       transparent: true,
       // backgroundTexture: Assets.get('gameBoard'),
@@ -188,7 +194,9 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
       gameContainerWidth: bounds.width,
       gameContainerHeight: bounds.height,
       height: '15%',
-      topPercentage: 85,
+      x: 0,
+      y: '85%',
+      anchor: { x: 0, y: 0 },
       backgroundColor: '#1A2C38',
       transparent: true,
       // backgroundTexture: Assets.get('bottomBar'),
@@ -202,19 +210,35 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
   };
 
   const addContentToContainers = (topBarRef: any, gameBoardRef: any, bottomBarRef: any) => {
-    //Top bar elements
+    // Get game container bounds for popups that need full screen dimensions
+    const bounds = gameContainer.getGameAreaBounds();
+
+    // ------------------ TOP BAR ELEMENTS -------------------- //
     balanceTab = createBalanceTab(topBarRef.container.width, topBarRef.container.height);
+    homeButton = createHomeButton(topBarRef.container.width, topBarRef.container.height);
+    settingsButton = createSettingsButton(topBarRef.container.width, topBarRef.container.height, bounds.width, bounds.height, gameContainer.gameArea);
+    rulesButton = createRulesButton(topBarRef.container.width, topBarRef.container.height);
+
     topBarRef.container.addChild(balanceTab);
+    topBarRef.container.addChild(homeButton);
+    topBarRef.container.addChild(settingsButton);
+    topBarRef.container.addChild(rulesButton);
+
+    // ------------------ REEL CONTAINER ELEMENTS -------------------- //
+    reelContainer = createReelContainer(gameBoardRef.container.width, gameBoardRef.container.height);
+
+    gameBoardRef.container.addChild(reelContainer);
     
-    // Bottom bar elements
-    // Create and store tab references
+    // ------------------ BOTTOM BAR ELEMENTS ----------------------- //
     betTab = createBetTab(bottomBarRef.container.width, bottomBarRef.container.height);
     winningsTab = createWinningsTab(bottomBarRef.container.width, bottomBarRef.container.height);
     spinButton = createSpinButton(bottomBarRef.container.width, bottomBarRef.container.height);
+    autoSpinButton = createAutoSpinButton(bottomBarRef.container.width, bottomBarRef.container.height);
 
     bottomBarRef.container.addChild(betTab);
     bottomBarRef.container.addChild(winningsTab);
     bottomBarRef.container.addChild(spinButton);
+    bottomBarRef.container.addChild(autoSpinButton);
   };
 
   // STEP 4: Remove splash screen
@@ -330,11 +354,27 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
         bottomBar.updateDimensions(bounds.width, bounds.height);
       }
 
+      // ----------------- TOP BAR ELEMENT RESIZING ------------------- //
       // Update top bar tabs with new container dimensions
       if(balanceTab && typeof balanceTab.resize === 'function') {
         (balanceTab as any).resize(topBar.container.width, topBar.container.height);
       }
+      if(homeButton && typeof homeButton.resize === 'function') {
+        (homeButton as any).resize(topBar.container.width, topBar.container.height);
+      }
+      if(settingsButton && typeof settingsButton.resize === 'function') {
+        (settingsButton as any).resize(topBar.container.width, topBar.container.height, bounds.width, bounds.height);
+      }
+      if(rulesButton && typeof rulesButton.resize === 'function') {
+        (rulesButton as any).resize(topBar.container.width, topBar.container.height);
+      }
 
+      // --------------- REEL CONTAINER ELEMENT RESIZING ------------------- //
+      if(reelContainer && typeof reelContainer.resize === 'function') {
+        (reelContainer as any).resize(bounds.width, bounds.height);
+      }
+
+      // ----------------- BOTTOM BAR ELEMENT RESIZING ------------------- //
       // Update bottom bar tabs with new container dimensions
       if (betTab && typeof (betTab as any).resize === 'function') {
         (betTab as any).resize(bottomBar.container.width, bottomBar.container.height);
@@ -344,6 +384,9 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
       }
       if (spinButton && typeof (spinButton as any).resize === 'function') {
         (spinButton as any).resize(bottomBar.container.width, bottomBar.container.height);
+      }
+      if (autoSpinButton && typeof (autoSpinButton as any).resize === 'function') {
+        (autoSpinButton as any).resize(bottomBar.container.width, bottomBar.container.height);
       }
 
 
