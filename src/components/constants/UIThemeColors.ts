@@ -7,7 +7,7 @@ export const UI_THEME = {
   
   // Input field colors (dark theme)
   INPUT_BACKGROUND: '#1E2A35',     // Dark blue-gray for input fields
-  INPUT_TEXT: '#FFFFFF',           // White text in dark inputs
+  INPUT_TEXT: '#FBC61A',           // White text in dark inputs
   INPUT_BORDER: '#34495E',         // Subtle border for inputs
   
   // Button colors (dark theme)

@@ -10,6 +10,8 @@ export async function loadAssets() {
     await Assets.load([
         { alias: 'gridCell', src: `${ASSET_BASE}assets/GridCell.png` },
         // { alias: 'diamondSprite', src: `${ASSET_BASE}sprites/diamond.json` },
+        { alias: 'spinButton', src: `${ASSET_BASE}assets/SpinButton.png` },
+        { alias: 'valueBar', src: `${ASSET_BASE}assets/ValueBar.png` },
         { alias: 'bomb', src: `${ASSET_BASE}assets/boom.png` },
         { alias: 'diamond', src: `${ASSET_BASE}assets/diamondStatic.png` },
         { alias: 'bombSprite', src: `${ASSET_BASE}sprites/bomb.json` },

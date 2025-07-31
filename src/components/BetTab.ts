@@ -63,7 +63,7 @@ export const createBetTab = (appWidth: number, appHeight: number) => {
     // Update value bar using Button methods
     if (valueBarRef) {
       (valueBarRef as any).setPosition(newWidth * UI_POS.BET_TAB_X, y_pos);
-      (valueBarRef as any).setSize(Math.max(newWidth * UI_POS.VALUE_BAR_WIDTH, 70), Math.max(30, newHeight * 0.04));
+      (valueBarRef as any).setSize(Math.max(newWidth * UI_POS.VALUE_BAR_WIDTH, 100), UI_POS.BET_TAB_MIN_HEIGHT);
     }
 
     // Update minus button using Button methods
@@ -71,7 +71,7 @@ export const createBetTab = (appWidth: number, appHeight: number) => {
       const valueBarPos = (valueBarRef as any).getPosition();
       const valueBarSize = (valueBarRef as any).getSize();
       (minusButtonRef as any).setPosition(valueBarPos.x - valueBarSize.width / 2 - newSpacing, y_pos);
-      (minusButtonRef as any).setSize(Math.max(30, newHeight * 0.04), Math.max(30, newHeight * 0.04));
+      (minusButtonRef as any).setSize(Math.max(newHeight * UI_POS.BET_TAB_MAX_HEIGHT_RATIO, UI_POS.BET_TAB_MIN_HEIGHT), Math.max(newHeight * UI_POS.BET_TAB_MAX_HEIGHT_RATIO, UI_POS.BET_TAB_MIN_HEIGHT));
     }
 
     // Update plus button using Button methods
@@ -79,7 +79,7 @@ export const createBetTab = (appWidth: number, appHeight: number) => {
       const valueBarPos = (valueBarRef as any).getPosition();
       const valueBarSize = (valueBarRef as any).getSize();
       (plusButtonRef as any).setPosition(valueBarPos.x + valueBarSize.width / 2 + newSpacing, y_pos);
-      (plusButtonRef as any).setSize(Math.max(30, newHeight * 0.04), Math.max(30, newHeight * 0.04));
+      (plusButtonRef as any).setSize(Math.max(newHeight * UI_POS.BET_TAB_MAX_HEIGHT_RATIO, UI_POS.BET_TAB_MIN_HEIGHT), Math.max(newHeight * UI_POS.BET_TAB_MAX_HEIGHT_RATIO, UI_POS.BET_TAB_MIN_HEIGHT));
     }
 
     // Update text position
@@ -94,16 +94,12 @@ export const createBetTab = (appWidth: number, appHeight: number) => {
   const valueBar = createButton({
     x: appWidth * UI_POS.BET_TAB_X,
     y: y_pos,
-    width: Math.max(appWidth * UI_POS.VALUE_BAR_WIDTH, 70),
-    height: Math.max(30, appHeight * 0.04),
-    color: UI_THEME.BET_VALUEBAR,
-    borderColor: UI_THEME.BET_TAB_BORDERCOLOR,
-    borderWidth: 2,
-    borderRadius: 3,
+    width: Math.max(appWidth * UI_POS.VALUE_BAR_WIDTH, 100),
+    height: Math.max(appHeight * UI_POS.BET_TAB_MAX_HEIGHT_RATIO, UI_POS.BET_TAB_MIN_HEIGHT),
     label: `${currentStakeAmount}`,
     texture: Assets.get('valueBar'),  
-    // textColor: UI_THEME.VALUE_BAR_TEXT,
-    textSize: Math.max(20, appHeight * 0.025),
+    textColor: UI_THEME.INPUT_TEXT,
+    textSize: Math.max(25, appHeight * 0.025),
     bold: true,
     onClick: () => {
       recordUserActivity(ActivityTypes.BUTTON_CLICK, { buttonName: 'valueBar' });
@@ -115,15 +111,9 @@ export const createBetTab = (appWidth: number, appHeight: number) => {
   const minusButton = createButton({
     x: valueBar.x - valueBar.width / 2 - spacing,
     y: y_pos,
-    width: Math.max(30, appHeight * 0.04),
-    height: Math.max(30, appHeight * 0.04),
-    color: UI_THEME.BET_PLUS_MINUS,
-    borderColor: UI_THEME.BET_TAB_BORDERCOLOR,
-    borderWidth: 2,
-    borderRadius: 3,
+    width: Math.max(appHeight * UI_POS.BET_TAB_MAX_HEIGHT_RATIO, UI_POS.BET_TAB_MIN_HEIGHT),
+    height: Math.max(appHeight * UI_POS.BET_TAB_MAX_HEIGHT_RATIO, UI_POS.BET_TAB_MIN_HEIGHT),
     texture: Assets.get('minusButton'),
-    // label: '-',
-    textColor: UI_THEME.INPUT_TEXT,
     onClick: () => {
       SoundManager.playBetDecrease();
       console.log('Minus button clicked');
@@ -136,15 +126,9 @@ export const createBetTab = (appWidth: number, appHeight: number) => {
   const plusButton = createButton({
     x: valueBar.x + valueBar.width / 2 + spacing,
     y: y_pos,
-    width: Math.max(30, appHeight * 0.04),
-    height: Math.max(30, appHeight * 0.04),
-    color: UI_THEME.BET_PLUS_MINUS,
-    borderColor: UI_THEME.BET_TAB_BORDERCOLOR,
-    borderWidth: 2,
-    borderRadius: 3,
+    width: Math.max(appHeight * UI_POS.BET_TAB_MAX_HEIGHT_RATIO, UI_POS.BET_TAB_MIN_HEIGHT),
+    height: Math.max(appHeight * UI_POS.BET_TAB_MAX_HEIGHT_RATIO, UI_POS.BET_TAB_MIN_HEIGHT),
     texture: Assets.get('plusButton'),
-    // label: '+',
-    textColor: UI_THEME.INPUT_TEXT,
     onClick: () => {
       SoundManager.playBetIncrease();
       console.log('Plus button clicked');

@@ -10,7 +10,7 @@ import { SoundManager } from './utils/SoundManager';
 // import { initializeSettingsPopupManager, getSettingsPopupManager } from './components/popups/SettingsPopupManager';
 import { createGameContainer } from './components/gameContainer';
 import {UI_THEME} from './components/constants/UIThemeColors';
-import { createBetTab, createBalanceTab } from './components/';
+import { createBetTab, createWinningsTab, createSpinButton, createBalanceTab } from './components/';
 import {
   createSimplePositionedContainer,
   createStyledPositionedContainer,
@@ -108,7 +108,13 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
   let gameContainer: any = null;
   // Store container references for resize updates
   let topBar: any, gameBoard: any, bottomBar: any;
-  let betTab: any, balanceTab: any;
+
+  //top bar
+  let balanceTab: any;
+
+  //bottom bar
+  let betTab: any, winningsTab: any, spinButton: any;
+
   const initializeGameUI = (): void => {
     console.log('🎮 STEP 3: Initializing game UI...');
 
@@ -155,7 +161,7 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
     topBar = createSimplePositionedContainer({
       gameContainerWidth: bounds.width,
       gameContainerHeight: bounds.height,
-      height: '10%',
+      height: '15%',
       topPercentage: 0,
       backgroundColor: '#1A2C38',
       transparent: true,
@@ -169,7 +175,7 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
       gameContainerWidth: bounds.width,
       gameContainerHeight: bounds.height,
       height: '75%',
-      topPercentage: 10,
+      topPercentage: 15,
       backgroundColor: '#4EC9B0',
       transparent: true,
       // backgroundTexture: Assets.get('gameBoard'),
@@ -196,12 +202,19 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
   };
 
   const addContentToContainers = (topBarRef: any, gameBoardRef: any, bottomBarRef: any) => {
+    //Top bar elements
+    balanceTab = createBalanceTab(topBarRef.container.width, topBarRef.container.height);
+    topBarRef.container.addChild(balanceTab);
+    
+    // Bottom bar elements
     // Create and store tab references
     betTab = createBetTab(bottomBarRef.container.width, bottomBarRef.container.height);
-    balanceTab = createBalanceTab(bottomBarRef.container.width, bottomBarRef.container.height);
+    winningsTab = createWinningsTab(bottomBarRef.container.width, bottomBarRef.container.height);
+    spinButton = createSpinButton(bottomBarRef.container.width, bottomBarRef.container.height);
 
     bottomBarRef.container.addChild(betTab);
-    bottomBarRef.container.addChild(balanceTab);
+    bottomBarRef.container.addChild(winningsTab);
+    bottomBarRef.container.addChild(spinButton);
   };
 
   // STEP 4: Remove splash screen
@@ -317,13 +330,22 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
         bottomBar.updateDimensions(bounds.width, bounds.height);
       }
 
-      // Update tabs with new container dimensions
+      // Update top bar tabs with new container dimensions
+      if(balanceTab && typeof balanceTab.resize === 'function') {
+        (balanceTab as any).resize(topBar.container.width, topBar.container.height);
+      }
+
+      // Update bottom bar tabs with new container dimensions
       if (betTab && typeof (betTab as any).resize === 'function') {
         (betTab as any).resize(bottomBar.container.width, bottomBar.container.height);
       }
-      if (balanceTab && typeof (balanceTab as any).resize === 'function') {
-        (balanceTab as any).resize(bottomBar.container.width, bottomBar.container.height);
+      if (winningsTab && typeof (winningsTab as any).resize === 'function') {
+        (winningsTab as any).resize(bottomBar.container.width, bottomBar.container.height);
       }
+      if (spinButton && typeof (spinButton as any).resize === 'function') {
+        (spinButton as any).resize(bottomBar.container.width, bottomBar.container.height);
+      }
+
 
       // Legacy container support (keeping for compatibility)
       if ((gameContainer as any).headerContainer) {
@@ -368,7 +390,7 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
     }
     resizeTimeout = setTimeout(() => {
       resize();
-    }, 50);
+    }, 0); // anything above 0, it doesn't work
   });
 
   return { app, resize };

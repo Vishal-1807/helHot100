@@ -6,22 +6,25 @@ import { UI_POS } from './constants/Positions';
 import { SoundManager } from '../utils/SoundManager';
 import { ActivityTypes, recordUserActivity } from '../utils/gameActivityManager';
 
-export const createBalanceTab = (appWidth: number, appHeight: number) => {
+
+export const createWinningsTab = (appWidth: number, appHeight: number) => {
   const container = new Container();
   container.zIndex = 50;
 
   let currentAppWidth = appWidth;
   let currentAppHeight = appHeight;
 
-  const balanceTab = createButton({
-    x: appWidth * UI_POS.BALANCE_TAB_X,
-    y: appHeight * UI_POS.BALANCE_TAB_Y,
-    width: appWidth * UI_POS.BALANCE_TAB_WIDTH,
-    height: Math.max(appHeight * UI_POS.BALANCE_TAB_MAX_HEIGHT_RATIO, UI_POS.BALANCE_TAB_MIN_HEIGHT),
+  const balanceTextY = appHeight * 0.046;
+
+  const winningsButton = createButton({
+    x: appWidth * UI_POS.WINNINGS_TAB_X,
+    y: appHeight * UI_POS.WINNINGS_TAB_Y,
+    width: appWidth * UI_POS.WINNINGS_TAB_WIDTH,
+    height: Math.max(appHeight * UI_POS.WINNINGS_TAB_MAX_HEIGHT_RATIO, UI_POS.WINNINGS_TAB_MIN_HEIGHT),
     texture: Assets.get('valueBar'),
     // fontFamily: 'GameFont',
-    label: '99999',
-    textSize: Math.max(25, appHeight * 0.035),
+    label: '999',
+    textSize: Math.max(27, appHeight * 0.035),
     textColor: UI_THEME.INPUT_TEXT,
     bold: true,
     onClick: () => {
@@ -31,19 +34,19 @@ export const createBalanceTab = (appWidth: number, appHeight: number) => {
     },
   });
 
+  // Resize method
   const resize = (newWidth: number, newHeight: number) => {
     currentAppWidth = newWidth;
     currentAppHeight = newHeight;
 
-    if(!balanceTab) return;
     // Update button position using setPosition method
-    (balanceTab as any).setPosition(newWidth * UI_POS.BALANCE_TAB_X, newHeight * UI_POS.BALANCE_TAB_Y);
+    (winningsButton as any).setPosition(newWidth * UI_POS.WINNINGS_TAB_X, newHeight * UI_POS.WINNINGS_TAB_Y);
 
     // Update button size using setSize method
-    (balanceTab as any).setSize(newWidth * UI_POS.BALANCE_TAB_WIDTH, Math.max(newHeight * UI_POS.BALANCE_TAB_MAX_HEIGHT_RATIO, UI_POS.BALANCE_TAB_MIN_HEIGHT));
+    (winningsButton as any).setSize(newWidth * UI_POS.WINNINGS_TAB_WIDTH, Math.max(newHeight * UI_POS.WINNINGS_TAB_MAX_HEIGHT_RATIO, UI_POS.WINNINGS_TAB_MIN_HEIGHT));
   };
 
-  container.addChild(balanceTab);
+  container.addChild(winningsButton);
 
   // Add resize method to container for external access
   (container as any).resize = resize;
@@ -51,4 +54,4 @@ export const createBalanceTab = (appWidth: number, appHeight: number) => {
   return container;
 };
 
-export default createBalanceTab;
+export default createWinningsTab;
