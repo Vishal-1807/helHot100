@@ -1,6 +1,7 @@
 import { Container, Graphics, Sprite, Texture, Assets } from 'pixi.js';
 import { createButton } from '../commons/Button';
 import {TOTAL_REELS, ICONS_PER_REEL} from '../constants/GameConstants';
+import { getSecureRandomNumber } from '../commons/getRandom';
 
 export const addSlotIcons = (reelColumn: any, reelColumnContainer: any) => {
     const slotIcons: any[] = [];
@@ -15,7 +16,7 @@ export const addSlotIcons = (reelColumn: any, reelColumnContainer: any) => {
             y: reelColumn.y - reelColumn.height/2 + (ICON_HEIGHT/2) + (ICON_HEIGHT * i),
             width: reelColumn.width*0.98,
             height: ICON_HEIGHT,
-            texture: tempSlotIcons[Math.floor(Math.random() * tempSlotIcons.length)],
+            texture: tempSlotIcons[Math.floor(getSecureRandomNumber(0, tempSlotIcons.length))],
             shadow: false,
             onClick: () => {
                 console.log('Slot icon clicked');
