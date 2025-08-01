@@ -14,6 +14,7 @@ export const createRulesButton = (appWidth: number, appHeight: number): Containe
     width: Math.max(appHeight * UI_POS.RULES_BUTTON_MAX_HEIGHT_RATIO, UI_POS.RULES_BUTTON_MIN_HEIGHT),
     height: Math.max(appHeight * UI_POS.RULES_BUTTON_MAX_HEIGHT_RATIO, UI_POS.RULES_BUTTON_MIN_HEIGHT),
     texture: Assets.get('Rules'),
+    borderRadius: 10,
     onClick: () => {
       SoundManager.playUIClick();
       console.log('Rules button clicked');

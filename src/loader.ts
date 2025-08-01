@@ -25,7 +25,18 @@ export async function loadAssets() {
         { alias: 'Sound', src: `${ASSET_BASE}assets/Sound.png` },
         { alias : 'Rules', src: `${ASSET_BASE}assets/Rules.png` },
         { alias: 'History', src: `${ASSET_BASE}assets/History.png` },
-        { alias: 'bg', src: `${ASSET_BASE}assets/bg.png` }
+        { alias: 'bg', src: `${ASSET_BASE}assets/bg.png` },
+
+        // -------------- SLOT ICONS ----------------- //
+        { alias: 'watermelonIcon', src: `${ASSET_BASE}assets/watermelon.png` },
+        { alias: 'sevenIcon', src: `${ASSET_BASE}assets/seven.png` },
+        { alias: 'plumIcon', src: `${ASSET_BASE}assets/plum.png` },
+        { alias: 'grapesIcon', src: `${ASSET_BASE}assets/grapes.png` },
+        { alias: 'cherryIcon', src: `${ASSET_BASE}assets/cherry.png` },
+        { alias: 'lemonIcon', src: `${ASSET_BASE}assets/lemon.png` },
+        { alias: 'scatterIcon', src: `${ASSET_BASE}assets/scatter.png` },
+        { alias: 'wildIcon', src: `${ASSET_BASE}assets/wild.png` },
+
     ]);
 
     console.log('All assets loaded successfully');

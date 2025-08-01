@@ -1,5 +1,6 @@
 import { Container, Graphics, Sprite, Texture, Assets } from 'pixi.js';
 import { createButton } from '../commons/Button';
+import { addSlotIcons } from '../Logic/addSlotIcons';
 
 export const createReelColumn = ({
     gameContainerWidth,
@@ -27,10 +28,13 @@ export const createReelColumn = ({
       height: gameContainerHeight * heightRatio,
       texture: Assets.get('reelColumn'),
     });
+
+    const slotIcons = addSlotIcons(reelColumn, container);
   
     const resize = (newWidth: number, newHeight: number) => {
       (reelColumn as any).setPosition(newWidth * xRatio, newHeight * yRatio);
       (reelColumn as any).setSize(newWidth * widthRatio, newHeight * heightRatio);
+      console.log(`ReelColumn resized to: ${newWidth}x${newHeight} and ratios x:${xRatio}, y:${yRatio}, w:${widthRatio}, h:${heightRatio}`);
     };
   
     container.addChild(reelColumn);

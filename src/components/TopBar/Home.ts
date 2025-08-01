@@ -22,6 +22,7 @@ export const createHomeButton = (appWidth: number, appHeight: number): Container
     width: Math.max(appHeight * UI_POS.HOME_BUTTON_MAX_HEIGHT_RATIO, UI_POS.HOME_BUTTON_MIN_HEIGHT),
     height: Math.max(appHeight * UI_POS.HOME_BUTTON_MAX_HEIGHT_RATIO, UI_POS.HOME_BUTTON_MIN_HEIGHT),
     texture: Assets.get('home'),
+    borderRadius: 10,
     onClick: () => {
       SoundManager.playUIClick();
       clickHandler();

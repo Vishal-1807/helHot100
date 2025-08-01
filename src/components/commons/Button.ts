@@ -9,7 +9,7 @@ export interface ButtonOptions {
   borderColor?: number | string;
   borderWidth?: number;
   borderRadius?: number;
-  texture?: Sprite | Texture; // Updated to support both Sprite and Texture
+  texture?: Sprite | Texture;
   hoverTint?: number | string;
   disabled?: boolean;
   onClick?: () => void;
@@ -20,9 +20,10 @@ export interface ButtonOptions {
   selected?: boolean;
   selectedTint?: number | string;
   fontFamily?: string;
-  anchor?: { x: number; y: number }; // New anchor option
-  bold?: boolean;        // New option for bold text
-  italic?: boolean;      // New option for italic text
+  anchor?: { x: number; y: number };
+  bold?: boolean;
+  italic?: boolean;
+  shadow?: boolean; // New shadow option
 }
 
 /**
@@ -60,9 +61,10 @@ export function createButton(options: ButtonOptions = {}): Container {
     selected = false,
     selectedTint,
     fontFamily = 'Arial',
-    anchor = { x: 0.5, y: 0.5 }, // Default anchor
-    bold = false,          // New default for bold
-    italic = false,        // New default for italic
+    anchor = { x: 0.5, y: 0.5 },
+    bold = false,
+    italic = false,
+    shadow = true, // Default shadow to true
   } = options;
 
   // State
@@ -75,8 +77,8 @@ export function createButton(options: ButtonOptions = {}): Container {
   const MOVEMENT_THRESHOLD = 10; // pixels
   let currentWidth = width;
   let currentHeight = height;
-  let currentBold = bold;       // Track current bold state
-  let currentItalic = italic;   // Track current italic state
+  let currentBold = bold;
+  let currentItalic = italic;
 
   // Create container
   const button = new Container();
@@ -89,27 +91,29 @@ export function createButton(options: ButtonOptions = {}): Container {
   const getOffsetY = () => -currentHeight * anchor.y;
 
   // Create shadow for raised effect
-  const shadow = new Graphics();
+  const shadowGraphics = new Graphics();
   const shadowOffset = 5;
   const shadowColor = 0x000000;
   const shadowAlpha = 0.3;
 
   const updateShadow = () => {
-    shadow.clear();
-    shadow.beginFill(shadowColor, shadowAlpha);
-    shadow.drawRoundedRect(
-      getOffsetX() + shadowOffset,
-      getOffsetY() + shadowOffset,
-      currentWidth,
-      currentHeight,
-      borderRadius
-    );
-    shadow.endFill();
+    shadowGraphics.clear();
+    if (shadow) { // Only draw shadow if enabled
+      shadowGraphics.beginFill(shadowColor, shadowAlpha);
+      shadowGraphics.drawRoundedRect(
+        getOffsetX() + shadowOffset,
+        getOffsetY() + shadowOffset,
+        currentWidth,
+        currentHeight,
+        borderRadius
+      );
+      shadowGraphics.endFill();
+    }
   };
 
   updateShadow();
-  shadow.zIndex = -1;
-  shadow.visible = isVisible;
+  shadowGraphics.zIndex = -1;
+  shadowGraphics.visible = isVisible && shadow && !isDisabled;
 
   // Create background
   let background: Sprite | Graphics;
@@ -131,7 +135,7 @@ export function createButton(options: ButtonOptions = {}): Container {
   background.visible = isVisible;
 
   // Add children with proper layering
-  button.addChild(shadow);
+  button.addChild(shadowGraphics);
   button.addChild(background);
 
   // Create text label with bold/italic support
@@ -142,8 +146,8 @@ export function createButton(options: ButtonOptions = {}): Container {
       fontSize: textSize || Math.min(currentWidth, currentHeight) * 0.4,
       fill: parseColor(textColor),
       align: 'center',
-      fontWeight: currentBold ? 'bold' : 'normal',    // Apply bold
-      fontStyle: currentItalic ? 'italic' : 'normal', // Apply italic
+      fontWeight: currentBold ? 'bold' : 'normal',
+      fontStyle: currentItalic ? 'italic' : 'normal',
     });
     text = new Text(label.toString(), textStyle);
     text.anchor.set(anchor.x, anchor.y);
@@ -219,7 +223,7 @@ export function createButton(options: ButtonOptions = {}): Container {
     button.interactive = !disable && isVisible;
     button.cursor = disable ? 'default' : 'pointer';
     button.alpha = disable ? 0.5 : 1.0;
-    shadow.visible = !disable && isVisible;
+    shadowGraphics.visible = shadow && !disable && isVisible;
 
     // Reset hover state when disabling to prevent stuck hover appearance
     if (disable) {
@@ -233,7 +237,7 @@ export function createButton(options: ButtonOptions = {}): Container {
   const setVisibility = (visible: boolean) => {
     isVisible = visible;
     button.visible = isVisible;
-    shadow.visible = isVisible;
+    shadowGraphics.visible = isVisible && shadow && !isDisabled;
     background.visible = isVisible;
     if (text) text.visible = isVisible;
     button.interactive = !isDisabled && isVisible;

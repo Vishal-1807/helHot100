@@ -163,7 +163,7 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
     topBar = createSimplePositionedContainer({
       gameContainerWidth: bounds.width,
       gameContainerHeight: bounds.height,
-      height: '15%',
+      height: '12%',
       x: 0,
       y: '0%',
       anchor: { x: 0, y: 0 },
@@ -178,9 +178,9 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
     gameBoard = createSimplePositionedContainer({
       gameContainerWidth: bounds.width,
       gameContainerHeight: bounds.height,
-      height: '70%',
+      height: '73%',
       x: 0,
-      y: '15%',
+      y: '12%',
       anchor: { x: 0, y: 0 },
       backgroundColor: '#4EC9B0',
       transparent: true,
@@ -348,6 +348,7 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
         topBar.updateDimensions(bounds.width, bounds.height);
       }
       if (gameBoard && typeof gameBoard.updateDimensions === 'function') {
+        console.log(`🎮 GameBoard updated to: ${gameBoard.container.width}x${gameBoard.container.height}`);
         gameBoard.updateDimensions(bounds.width, bounds.height);
       }
       if (bottomBar && typeof bottomBar.updateDimensions === 'function') {
@@ -356,37 +357,44 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
 
       // ----------------- TOP BAR ELEMENT RESIZING ------------------- //
       // Update top bar tabs with new container dimensions
+      const topBarBounds = topBar.getActualBounds();
+
       if(balanceTab && typeof balanceTab.resize === 'function') {
-        (balanceTab as any).resize(topBar.container.width, topBar.container.height);
+        (balanceTab as any).resize(topBarBounds.width, topBarBounds.height);
       }
       if(homeButton && typeof homeButton.resize === 'function') {
-        (homeButton as any).resize(topBar.container.width, topBar.container.height);
+        (homeButton as any).resize(topBarBounds.width, topBarBounds.height);
       }
       if(settingsButton && typeof settingsButton.resize === 'function') {
-        (settingsButton as any).resize(topBar.container.width, topBar.container.height, bounds.width, bounds.height);
+        (settingsButton as any).resize(topBarBounds.width, topBarBounds.height, bounds.width, bounds.height);
       }
       if(rulesButton && typeof rulesButton.resize === 'function') {
-        (rulesButton as any).resize(topBar.container.width, topBar.container.height);
+        (rulesButton as any).resize(topBarBounds.width, topBarBounds.height);
       }
 
       // --------------- REEL CONTAINER ELEMENT RESIZING ------------------- //
+      const gameBoardBounds = gameBoard.getActualBounds();
+
       if(reelContainer && typeof reelContainer.resize === 'function') {
-        (reelContainer as any).resize(bounds.width, bounds.height);
+        console.log(`🎮 GameBoard actual bounds: ${gameBoardBounds.width}x${gameBoardBounds.height}`);
+        (reelContainer as any).resize(gameBoardBounds.width, gameBoardBounds.height);
       }
 
       // ----------------- BOTTOM BAR ELEMENT RESIZING ------------------- //
       // Update bottom bar tabs with new container dimensions
+      const bottomBarBounds = bottomBar.getActualBounds();
+
       if (betTab && typeof (betTab as any).resize === 'function') {
-        (betTab as any).resize(bottomBar.container.width, bottomBar.container.height);
+        (betTab as any).resize(bottomBarBounds.width, bottomBarBounds.height);
       }
       if (winningsTab && typeof (winningsTab as any).resize === 'function') {
-        (winningsTab as any).resize(bottomBar.container.width, bottomBar.container.height);
+        (winningsTab as any).resize(bottomBarBounds.width, bottomBarBounds.height);
       }
       if (spinButton && typeof (spinButton as any).resize === 'function') {
-        (spinButton as any).resize(bottomBar.container.width, bottomBar.container.height);
+        (spinButton as any).resize(bottomBarBounds.width, bottomBarBounds.height);
       }
       if (autoSpinButton && typeof (autoSpinButton as any).resize === 'function') {
-        (autoSpinButton as any).resize(bottomBar.container.width, bottomBar.container.height);
+        (autoSpinButton as any).resize(bottomBarBounds.width, bottomBarBounds.height);
       }
 
 

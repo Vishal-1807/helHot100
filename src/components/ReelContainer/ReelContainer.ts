@@ -2,7 +2,7 @@
 //dont add background
 import { Container, Graphics, Sprite, Texture, Assets } from 'pixi.js';
 import { createReelColumn } from './ReelColumn';
-import { REEL_COLUMN_WIDTH_RATIO, REEL_COLUMN_HEIGHT_RATIO, REEL_COLUMN_Y_RATIO, TOTAL_REELS, REEL_CONTAINER_EDGES_SPACING_RATIO, REEL_COLUMN_OFFSET_RATIO } from '../constants/GameConstants';
+import { REEL_COLUMN_HEIGHT_RATIO, REEL_COLUMN_Y_RATIO, TOTAL_REELS, REEL_CONTAINER_EDGES_SPACING_RATIO, REEL_COLUMN_OFFSET_RATIO } from '../constants/GameConstants';
 
 export const createReelContainer = (gameContainerWidth: number, gameContainerHeight: number) => {
     const container = new Container();

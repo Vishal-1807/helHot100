@@ -39,6 +39,7 @@ export const createSettingsButton = (appWidth: number, appHeight: number, gameCo
     width: Math.max(appHeight * UI_POS.SETTINGS_BUTTON_MAX_HEIGHT_RATIO, UI_POS.SETTINGS_BUTTON_MIN_HEIGHT),
     height: Math.max(appHeight * UI_POS.SETTINGS_BUTTON_MAX_HEIGHT_RATIO, UI_POS.SETTINGS_BUTTON_MIN_HEIGHT),
     texture: Assets.get('settings'),
+    borderRadius: 10,
     onClick: () => {
       SoundManager.playUIClick();
       console.log('Settings button clicked');

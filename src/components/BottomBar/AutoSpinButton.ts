@@ -17,6 +17,7 @@ export const createAutoSpinButton = (appWidth: number, appHeight: number, onClic
     width: appWidth * UI_POS.AUTO_SPIN_BUTTON_WIDTH,
     height: Math.max(appHeight * UI_POS.AUTO_SPIN_BUTTON_MAX_HEIGHT_RATIO, UI_POS.AUTO_SPIN_BUTTON_MIN_HEIGHT),
     texture: Assets.get('autoSpinButton'),
+    borderRadius: 10,
     onClick: () => {
       SoundManager.playUIClick();
       console.log('Auto spin button clicked');

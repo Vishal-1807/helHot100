@@ -19,6 +19,7 @@ export const createWinningsTab = (appWidth: number, appHeight: number) => {
     width: appWidth * UI_POS.WINNINGS_TAB_WIDTH,
     height: Math.max(appHeight * UI_POS.WINNINGS_TAB_MAX_HEIGHT_RATIO, UI_POS.WINNINGS_TAB_MIN_HEIGHT),
     texture: Assets.get('valueBar'),
+    borderRadius: 15,
     // fontFamily: 'GameFont',
     label: '999',
     textSize: Math.max(27, appHeight * 0.035),

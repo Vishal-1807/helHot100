@@ -17,6 +17,7 @@ export const createBalanceTab = (appWidth: number, appHeight: number) => {
     height: Math.max(appHeight * UI_POS.BALANCE_TAB_MAX_HEIGHT_RATIO, UI_POS.BALANCE_TAB_MIN_HEIGHT),
     texture: Assets.get('valueBar'),
     // fontFamily: 'GameFont',
+    borderRadius: 15,
     label: '99999',
     textSize: Math.max(25, appHeight * 0.035),
     textColor: UI_THEME.INPUT_TEXT,

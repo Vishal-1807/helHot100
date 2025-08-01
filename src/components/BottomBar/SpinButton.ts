@@ -16,6 +16,7 @@ export const createSpinButton = (appWidth: number, appHeight: number): Container
     y: appHeight * UI_POS.SPIN_BUTTON_Y,
     width: appWidth * UI_POS.SPIN_BUTTON_WIDTH,
     height: Math.max(appHeight * UI_POS.SPIN_BUTTON_MAX_HEIGHT_RATIO, UI_POS.SPIN_BUTTON_MIN_HEIGHT),
+    borderRadius: 10,
     texture: Assets.get('spinButton'),
     onClick: () => {
       SoundManager.playUIClick();

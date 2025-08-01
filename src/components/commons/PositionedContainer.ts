@@ -116,6 +116,8 @@ export const createPositionedContainer = (config: PositionedContainerConfig): Po
   let currentY = y;
   let currentAnchor = anchor;
   let currentTextureFit = textureFit;
+  let currentGameContainerWidth = gameContainerWidth;
+  let currentGameContainerHeight = gameContainerHeight;
 
   const calculateActualWidth = (gw: number): number => {
     if (typeof currentWidth === 'string' && currentWidth.endsWith('%')) {
@@ -294,6 +296,10 @@ export const createPositionedContainer = (config: PositionedContainerConfig): Po
   };
 
   const updatePosition = (cw: number, ch: number) => {
+    // Update current dimensions
+    currentGameContainerWidth = cw;
+    currentGameContainerHeight = ch;
+
     const aw = calculateActualWidth(cw) - marginLeft - marginRight;
     const ah = calculateActualHeight(ch);
     const ax = calculateActualX(cw);
@@ -358,10 +364,10 @@ export const createPositionedContainer = (config: PositionedContainerConfig): Po
   };
 
   const getActualBounds = () => {
-    const aw = calculateActualWidth(gameContainerWidth) - marginLeft - marginRight;
-    const ah = calculateActualHeight(gameContainerHeight);
-    const ax = calculateActualX(gameContainerWidth);
-    const ay = calculateActualY(gameContainerHeight);
+    const aw = calculateActualWidth(currentGameContainerWidth) - marginLeft - marginRight;
+    const ah = calculateActualHeight(currentGameContainerHeight);
+    const ax = calculateActualX(currentGameContainerWidth);
+    const ay = calculateActualY(currentGameContainerHeight);
     return {
       x: ax - aw * currentAnchor.x,
       y: ay - ah * currentAnchor.y,

@@ -93,7 +93,8 @@ export const createBetTab = (appWidth: number, appHeight: number) => {
     width: Math.max(appWidth * UI_POS.VALUE_BAR_WIDTH, 100),
     height: Math.max(appHeight * UI_POS.BET_TAB_MAX_HEIGHT_RATIO, UI_POS.BET_TAB_MIN_HEIGHT),
     label: `${currentStakeAmount}`,
-    texture: Assets.get('valueBar'),  
+    texture: Assets.get('valueBar'),
+    borderRadius: 10, 
     textColor: UI_THEME.INPUT_TEXT,
     textSize: Math.max(25, appHeight * 0.025),
     bold: true,
@@ -109,6 +110,7 @@ export const createBetTab = (appWidth: number, appHeight: number) => {
     y: y_pos,
     width: Math.max(appHeight * UI_POS.BET_TAB_MAX_HEIGHT_RATIO, UI_POS.BET_TAB_MIN_HEIGHT),
     height: Math.max(appHeight * UI_POS.BET_TAB_MAX_HEIGHT_RATIO, UI_POS.BET_TAB_MIN_HEIGHT),
+    borderRadius: 10,
     texture: Assets.get('minusButton'),
     onClick: () => {
       SoundManager.playBetDecrease();
@@ -124,6 +126,7 @@ export const createBetTab = (appWidth: number, appHeight: number) => {
     y: y_pos,
     width: Math.max(appHeight * UI_POS.BET_TAB_MAX_HEIGHT_RATIO, UI_POS.BET_TAB_MIN_HEIGHT),
     height: Math.max(appHeight * UI_POS.BET_TAB_MAX_HEIGHT_RATIO, UI_POS.BET_TAB_MIN_HEIGHT),
+    borderRadius: 10,
     texture: Assets.get('plusButton'),
     onClick: () => {
       SoundManager.playBetIncrease();
