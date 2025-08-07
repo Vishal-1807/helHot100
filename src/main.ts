@@ -216,7 +216,7 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
     // ------------------ TOP BAR ELEMENTS -------------------- //
     balanceTab = createBalanceTab(topBarRef.container.width, topBarRef.container.height);
     homeButton = createHomeButton(topBarRef.container.width, topBarRef.container.height);
-    settingsButton = createSettingsButton(topBarRef.container.width, topBarRef.container.height, bounds.width, bounds.height, gameContainer.gameArea);
+    settingsButton = createSettingsButton(topBarRef.container.width, topBarRef.container.height, bounds.width, bounds.height, app.stage);
     rulesButton = createRulesButton(topBarRef.container.width, topBarRef.container.height);
 
     topBarRef.container.addChild(balanceTab);
@@ -232,13 +232,15 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
     // ------------------ BOTTOM BAR ELEMENTS ----------------------- //
     betTab = createBetTab(bottomBarRef.container.width, bottomBarRef.container.height);
     winningsTab = createWinningsTab(bottomBarRef.container.width, bottomBarRef.container.height);
-    spinButton = createSpinButton(bottomBarRef.container.width, bottomBarRef.container.height);
+    spinButton = createSpinButton(bottomBarRef.container.width, bottomBarRef.container.height, gameContainer, reelContainer);
     autoSpinButton = createAutoSpinButton(bottomBarRef.container.width, bottomBarRef.container.height);
 
     bottomBarRef.container.addChild(betTab);
     bottomBarRef.container.addChild(winningsTab);
     bottomBarRef.container.addChild(spinButton);
     bottomBarRef.container.addChild(autoSpinButton);
+
+    gameBoardRef.container.sortableChildren = true;
   };
 
   // STEP 4: Remove splash screen

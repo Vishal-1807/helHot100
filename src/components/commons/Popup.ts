@@ -1,5 +1,6 @@
 import { Container, Graphics, Sprite, Assets } from 'pixi.js';
 import { createButton } from '../commons/Button';
+import { Z_INDEX } from '../constants/ZIndex';
 
 interface SimplePopupOptions {
   width: number;
@@ -28,7 +29,7 @@ const createSimplePopup = ({
   closeButtonTexture = 'backButton'
 }: SimplePopupOptions) => {
   const container = new Container();
-  container.zIndex = 200;
+  container.zIndex = Z_INDEX.POPUP_OVERLAY;
 
   // Calculate dimensions
   const calculateDimensions = (w: number, h: number): SimplePopupDimensions => {

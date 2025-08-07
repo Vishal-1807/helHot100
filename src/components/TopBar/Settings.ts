@@ -15,8 +15,8 @@ export const createSettingsButton = (appWidth: number, appHeight: number, gameCo
   const showSettingsPopup = () => {
     if (!settingsPopup) {
       // Use game container dimensions if provided, otherwise fall back to app dimensions
-      const popupWidth = gameContainerWidth || appWidth;
-      const popupHeight = gameContainerHeight || appHeight;
+      const popupWidth = gameContainerWidth;
+      const popupHeight = gameContainerHeight;
       settingsPopup = createSettingsPopup(popupWidth, popupHeight, hideSettingsPopup);
 
       // Add popup to game area container if available, otherwise to button container
@@ -59,8 +59,8 @@ export const createSettingsButton = (appWidth: number, appHeight: number, gameCo
     // Resize popup if it exists (whether visible or not)
     if (settingsPopup) {
       // Use updated game container dimensions if available
-      const popupWidth = gameContainerWidth || newWidth;
-      const popupHeight = gameContainerHeight || newHeight;
+      const popupWidth = gameContainerWidth;
+      const popupHeight = gameContainerHeight;
 
       // Call the popup's resize method if it exists
       if (typeof (settingsPopup as any).resize === 'function') {

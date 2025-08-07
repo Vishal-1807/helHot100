@@ -13,7 +13,7 @@ export const createBetTab = (appWidth: number, appHeight: number) => {
 
   let currentStakeAmount = GlobalState.getStakeAmount();
 
-  const spacing = appWidth * 0.025
+  const spacing = appWidth * 0.020
 
   const betAmountTextY = GlobalState.smallScreen ? appHeight * 0.046 : appHeight * 0.037;
 

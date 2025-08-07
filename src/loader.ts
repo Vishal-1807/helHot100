@@ -36,6 +36,19 @@ export async function loadAssets() {
         { alias: 'lemonIcon', src: `${ASSET_BASE}assets/lemon.png` },
         { alias: 'scatterIcon', src: `${ASSET_BASE}assets/scatter.png` },
         { alias: 'wildIcon', src: `${ASSET_BASE}assets/wild.png` },
+        // ---------------- BLURRED SLOT ICONS ----------------- //
+        { alias: 'watermelonBlur', src: `${ASSET_BASE}assets/watermelonBlur.png` },
+        { alias: 'sevenBlur', src: `${ASSET_BASE}assets/sevenBlur.png` },
+        { alias: 'plumBlur', src: `${ASSET_BASE}assets/plumBlur.png` },
+        { alias: 'grapesBlur', src: `${ASSET_BASE}assets/grapesBlur.png` },
+        { alias: 'cherryBlur', src: `${ASSET_BASE}assets/cherryBlur.png` },
+        { alias: 'lemonBlur', src: `${ASSET_BASE}assets/lemonBlur.png` },
+        { alias: 'scatterBlur', src: `${ASSET_BASE}assets/scatterBlur.png` },
+        { alias: 'wildBlur', src: `${ASSET_BASE}assets/wildBlur.png` },
+
+        // ------------- WIN POPUP ----------------- //
+        { alias: 'totalWin', src: `${ASSET_BASE}assets/TotalWin.png` },
+        { alias: 'bigWin', src: `${ASSET_BASE}assets/BigWin.png` },
 
     ]);
 

@@ -14,6 +14,9 @@ let balanceChangeListeners: ((newBalance: number) => void)[] = [];
 let betStepsChangeListeners: ((newBetSteps: number[]) => void)[] = [];
 let rewardChangeListeners: ((newReward: number) => void)[] = [];
 
+//2-d Matrix for icon positions
+let iconPositions: { x: number; y: number }[][] = [];
+
 // Pending game restoration listeners
 let pendingGameRestoreListeners: Array<() => void> = [];
 let pendingGameRestoreCompleteListeners: Array<() => void> = [];
@@ -144,6 +147,17 @@ const addGameEndedListener = (callback: () => void) => {
             console.log(`Removed game ended listener. Remaining listeners: ${gameEndedListeners.length}`);
         }
     };
+}
+
+const setIconPosition = (row: number, col: number, position: { x: number; y: number }) => {
+    if (!iconPositions[row]) {
+        iconPositions[row] = [];
+    }
+    iconPositions[row][col] = position;
+}
+
+const getIconPosition = () => {
+    return iconPositions;
 }
 
 const setBalance = (balance: number) => {
@@ -557,6 +571,10 @@ export const GlobalState = {
     getApiUrl,
     setWebSocketUrl,
     getWebSocketUrl,
+
+    //icon positions
+    setIconPosition,
+    getIconPosition,
 
     //screen size
     smallScreen: false,

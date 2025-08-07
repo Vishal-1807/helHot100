@@ -2,12 +2,13 @@ import { Assets, Container, Graphics } from 'pixi.js';
 import { createSimplePositionedContainer } from '../commons/PositionedContainer';
 import { createButton } from '../commons/Button';
 import { UI_POS } from '../constants/Positions';
+import { Z_INDEX } from '../constants/ZIndex';
 import { SoundManager } from '../../utils/SoundManager';
 import { ActivityTypes, recordUserActivity } from '../../utils/gameActivityManager';
 
 export const createSettingsPopup = (appWidth: number, appHeight: number, onClose?: () => void): Container => {
   const container = new Container();
-  container.zIndex = 100;
+  container.zIndex = Z_INDEX.POPUP_OVERLAY;
 
   // Create dark translucent background overlay
   const backgroundOverlay = new Graphics();

@@ -143,7 +143,7 @@ export function createButton(options: ButtonOptions = {}): Container {
   if (label !== undefined) {
     const textStyle = new TextStyle({
       fontFamily,
-      fontSize: textSize || Math.min(currentWidth, currentHeight) * 0.4,
+      fontSize: textSize || Math.min(currentWidth, currentHeight) * 0.6,
       fill: parseColor(textColor),
       align: 'center',
       fontWeight: currentBold ? 'bold' : 'normal',
