@@ -13,7 +13,7 @@ export const addSlotIcons = (reelColumn: any, reelColumnContainer: any, columnNu
         const slotIcon = createButton({
             x: reelColumn.x,
             y: reelColumn.y - reelColumn.height/2 + (ICON_HEIGHT/2) + (ICON_HEIGHT * i),
-            width: reelColumn.width*0.98,
+            width: ICON_HEIGHT * 1.05,
             anchor: { x: 0.5, y: 0.5 },
             height: ICON_HEIGHT * 1.05,
             texture: Assets.get(icons[Math.floor(getSecureRandomNumber(0, icons.length-1))]),

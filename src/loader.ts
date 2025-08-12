@@ -8,22 +8,17 @@ export async function loadAssets() {
     
     // Load all assets including the font file
     await Assets.load([
-        { alias: 'gridCell', src: `${ASSET_BASE}assets/GridCell.png` },
         // { alias: 'diamondSprite', src: `${ASSET_BASE}sprites/diamond.json` },
         { alias: 'spinButton', src: `${ASSET_BASE}assets/SpinButton.png` },
         { alias: 'autoSpinButton', src: `${ASSET_BASE}assets/AutoSpinButton.png` },
         { alias: 'valueBar', src: `${ASSET_BASE}assets/ValueBar.png` },
-        { alias: 'balanceTab', src: `${ASSET_BASE}assets/BalanceTab.png` },
         { alias: 'home', src: `${ASSET_BASE}assets/Home.png` },
         { alias : 'settings', src: `${ASSET_BASE}assets/Settings.png` },
         { alias: 'reelColumn', src: `${ASSET_BASE}assets/ReelColumn.png` },
-        { alias: 'button', src: `${ASSET_BASE}assets/Button.png` },
         { alias: 'plusButton', src: `${ASSET_BASE}assets/PlusButton.png` },
         { alias: 'minusButton', src: `${ASSET_BASE}assets/MinusButton.png` },
         { alias: 'closeButton', src: `${ASSET_BASE}assets/CloseButton.png` },
-        { alias: 'Sound', src: `${ASSET_BASE}assets/Sound.png` },
         { alias : 'Rules', src: `${ASSET_BASE}assets/Rules.png` },
-        { alias: 'History', src: `${ASSET_BASE}assets/History.png` },
         { alias: 'bg', src: `${ASSET_BASE}assets/bganimation.mp4` },
 
         // -------------- SLOT ICONS ----------------- //
