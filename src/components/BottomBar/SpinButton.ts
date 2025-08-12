@@ -44,8 +44,8 @@ export const createSpinButton = (appWidth: number, appHeight: number, gameContai
       // Start the animated reel spin with custom speed and duration
       animateReelSpin({
         reelContainer,
-        duration: 1000,
-        speed: 0.7 // 2.5x speed for faster spinning
+        duration: 1300,
+        speed: 2.5 // 2.5x speed for faster spinning
       });
 
       // After animation completes, stop reels sequentially from left to right

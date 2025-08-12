@@ -130,7 +130,7 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
       backgroundColor: '#1A2C38'
     });
 
-    // Add background image to the game container (behind all other containers)
+    // Add background video to the game container (behind all other containers)
     const bgTexture = Assets.get('bg');
     if (bgTexture) {
       const bgSprite = new Sprite(bgTexture);
@@ -145,13 +145,20 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
       // Set z-index to be behind all other containers
       bgSprite.zIndex = -1;
 
+      // Enable video looping if it's a video texture
+      if (bgTexture.source && bgTexture.source.resource && bgTexture.source.resource.loop !== undefined) {
+        bgTexture.source.resource.loop = true;
+        bgTexture.source.resource.autoplay = true;
+        console.log('🎬 Background video set to loop');
+      }
+
       // Add to game area
       gameContainer.gameArea.addChild(bgSprite);
 
       // Store reference for resize handling
       (gameContainer as any).backgroundSprite = bgSprite;
 
-      // console.log('🖼️ Background image added to game container with dimensions:', targetWidth, 'x', targetHeight);
+      console.log('🎬 Background video added to game container');
     } else {
       console.warn('⚠️ Background texture not found');
     }
@@ -216,8 +223,8 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
     // ------------------ TOP BAR ELEMENTS -------------------- //
     balanceTab = createBalanceTab(topBarRef.container.width, topBarRef.container.height);
     homeButton = createHomeButton(topBarRef.container.width, topBarRef.container.height);
-    settingsButton = createSettingsButton(topBarRef.container.width, topBarRef.container.height, bounds.width, bounds.height, app.stage);
-    rulesButton = createRulesButton(topBarRef.container.width, topBarRef.container.height);
+    settingsButton = createSettingsButton(topBarRef.container.width, topBarRef.container.height, gameContainer, app.stage);
+    rulesButton = createRulesButton(topBarRef.container.width, topBarRef.container.height, gameContainer, app.stage);
 
     topBarRef.container.addChild(balanceTab);
     topBarRef.container.addChild(homeButton);
@@ -368,10 +375,10 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
         (homeButton as any).resize(topBarBounds.width, topBarBounds.height);
       }
       if(settingsButton && typeof settingsButton.resize === 'function') {
-        (settingsButton as any).resize(topBarBounds.width, topBarBounds.height, bounds.width, bounds.height);
+        (settingsButton as any).resize(topBarBounds.width, topBarBounds.height, gameContainer);
       }
       if(rulesButton && typeof rulesButton.resize === 'function') {
-        (rulesButton as any).resize(topBarBounds.width, topBarBounds.height);
+        (rulesButton as any).resize(topBarBounds.width, topBarBounds.height, gameContainer);
       }
 
       // --------------- REEL CONTAINER ELEMENT RESIZING ------------------- //
@@ -607,17 +614,17 @@ const checkPendingGames = async (removeSplashScreen: () => void): Promise<boolea
         console.log('🎮 200 OK response received');
         
         if(res?.hasExistingGame){
-          console.log('🎮 Existing game found - processing restoration...');
-          console.log('🎮 Restoration data:', res);
-          GlobalState.gridCols = parseInt(res?.gridOption?.split('x')[0]);
-          GlobalState.gridRows = parseInt(res?.gridOption?.split('x')[1]);
-          GlobalState.setRoundId(res?.roundId);
-          GlobalState.setReward(res?.currentWinning || 0);
-          GlobalState.setStakeAmount(res?.betAmount || 1);
-          GlobalState.setMinesCount(res?.mineCount);
-          GlobalState.setGameMatrix(res?.revealedMatrix);
-          //set mines clicked to 0 if res.revealedCount doesnt exist
-          GlobalState.setMinesClickedCount(res?.revealedCount || 0);
+          // console.log('🎮 Existing game found - processing restoration...');
+          // console.log('🎮 Restoration data:', res);
+          // GlobalState.gridCols = parseInt(res?.gridOption?.split('x')[0]);
+          // GlobalState.gridRows = parseInt(res?.gridOption?.split('x')[1]);
+          // GlobalState.setRoundId(res?.roundId);
+          // GlobalState.setReward(res?.currentWinning || 0);
+          // GlobalState.setStakeAmount(res?.betAmount || 1);
+          // GlobalState.setMinesCount(res?.mineCount);
+          // GlobalState.setGameMatrix(res?.revealedMatrix);
+          // //set mines clicked to 0 if res.revealedCount doesnt exist
+          // GlobalState.setMinesClickedCount(res?.revealedCount || 0);
 
           // TODO: Implement your game's restoration logic here
           // Example restoration steps:

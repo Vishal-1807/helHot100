@@ -102,7 +102,7 @@ export const animateReelSpin = (params: AnimateReelSpinParams) => {
     const animationStartY = reelColumnButton.y + localBounds.y + (ICON_HEIGHT / 2); // Center of first icon
 
     // Create more icons for seamless continuous animation
-    const totalAnimationIcons = ICONS_PER_REEL;
+    const totalAnimationIcons = ICONS_PER_REEL+4;
     const animationIcons: any[] = [];
 
     // Start icons at the animation start point
@@ -128,10 +128,10 @@ export const animateReelSpin = (params: AnimateReelSpinParams) => {
     // Create mask to hide icons outside the reel area
     const mask = new Graphics();
     mask.rect(
-      localBounds.x+20,
-      localBounds.y,
+      localBounds.x,
+      localBounds.y+8,
       localBounds.width,
-      localBounds.height-10
+      localBounds.height-20
     );
     mask.fill(0xffffff);
     mask.x = reelColumnButton.x;

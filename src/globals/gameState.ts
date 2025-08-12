@@ -22,33 +22,20 @@ let pendingGameRestoreListeners: Array<() => void> = [];
 let pendingGameRestoreCompleteListeners: Array<() => void> = [];
 
 // Layout constants
-const DEFAULT_ROWS = 3;
-const DEFAULT_COLS = 3;
 const DEFAULT_BALANCE = 1000000;
 const DEFAULT_STAKE = 1.00;
 const DEFAULT_TABLE_ID = "STGMF101";
 
-//Grid Dimensions
-let gridCols = DEFAULT_COLS;
-let gridRows = DEFAULT_ROWS;
+let rulesPage = 1;
 
 //urls
 let s3_url = "";
 let api_url = "";
 let websocket_url = "";
 
-
-//Screen size
-let smallScreen = false;
-
 let betSteps: number[] = [
     0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 2, 3, 4, 5, 6, 7, 8, 9, 10000,
 ];
-
-// Mines state
-let currentMinesCount = 1;
-
-let minesClicked = 0;
 
 // Clicked cells tracking for current round
 let clickedCells: Set<string> = new Set();
@@ -78,13 +65,7 @@ const getWebSocketUrl = () => {
 }
 
 const setGameState = () => {
-    console.log(GlobalState.getMinesClickedCount(), "helloo");
-    hideBetButton();
-    showGameButtons();
-    disableSettingButtons();
-    if(GlobalState.getMinesClickedCount() >= 1){
-        enableCashoutButton();
-    }
+    
 }
 
 const setGameStarted = (started: boolean) => {
@@ -204,33 +185,6 @@ const getTableId = () => {
     return GlobalState.table_id;
 };
 
-const setGridDimensions = (cols: number, rows: number) => {
-    console.log(cols, rows, 'grid dimensions for setting')
-    const prevCols = GlobalState.gridCols;
-    const prevRows = GlobalState.gridRows;
-    
-    GlobalState.gridCols = cols;
-    GlobalState.gridRows = rows;
-    
-    console.log(`Grid dimensions updated: ${cols}x${rows} (previous: ${prevCols}x${prevRows})`);
-    
-    // Trigger listeners only if dimensions actually changed
-    if (prevCols !== cols || prevRows !== rows) {
-        console.log(`Triggering ${gridDimensionChangeListeners.length} grid dimension change listeners`);
-        gridDimensionChangeListeners.forEach(listener => {
-            try {
-                listener(cols, rows);
-            } catch (error) {
-                console.error('Error in grid dimension change listener:', error);
-            }
-        });
-    }
-};
-
-const getGridDimensions = () => {
-    return `${GlobalState.gridCols}x${GlobalState.gridRows}`;
-}
-
 const addGridDimensionChangeListener = (callback: (cols: number, rows: number) => void) => {
     gridDimensionChangeListeners.push(callback);
     console.log(`Added grid dimension change listener. Total listeners: ${gridDimensionChangeListeners.length}`);
@@ -295,43 +249,11 @@ const getStakeAmount = () => {
     return GlobalState.stakeAmount;
 };
 
-// Mines functions
-const setMinesCount = (count: number) => {
-    console.log(count, 'hello count');
-    const maxMines = GlobalState.gridRows * GlobalState.gridCols - 1;
-    console.log(maxMines, 'hello max mines');
-    if (count >= 1 && count <= maxMines) {
-        currentMinesCount = count;
-        console.log(`Mines count set to: ${count}`);
-    }
-};
-
-const getMinesCount = () => {
-    return currentMinesCount;
-};
-
-const setMinesClickedCount = (count: number) => {
-    minesClicked = count;
-    console.log(`Mines clicked set to: ${count}`);
-};
-
-const mineClicked = () => {
-    minesClicked++;
-    console.log(`Mines clicked set to: ${minesClicked}`);
-};
-
-const getMinesClickedCount = () => {
-    return minesClicked;
-};
-
-const resetMinesClickedCount = () => {
-    minesClicked = 0;
-    console.log(`Mines clicked reset to: ${minesClicked}`);
-};
-
-const getMaxMines = () => {
-    return GlobalState.gridRows * GlobalState.gridCols - 1;
-};
+//Rule page
+const setRulePage = (page: number) => {
+    GlobalState.rulesPage = page;
+    console.log(`Rule page set to: ${page}`);
+}
 
 // Bet cycling functions
 const cycleBetUp = () => {
@@ -352,21 +274,6 @@ const cycleBetDown = () => {
     return newStakeAmount;
 };
 
-// Mines cycling functions
-const cycleMinesUp = () => {
-    const maxMines = getMaxMines();
-    currentMinesCount = currentMinesCount >= maxMines ? 1 : currentMinesCount + 1;
-    console.log(`⛏️ Cycled mines up to: ${currentMinesCount}`);
-    return currentMinesCount;
-};
-
-const cycleMinesDown = () => {
-    const maxMines = getMaxMines();
-    currentMinesCount = currentMinesCount <= 1 ? maxMines : currentMinesCount - 1;
-    console.log(`⛏️ Cycled mines down to: ${currentMinesCount}`);
-    return currentMinesCount;
-};
-
 const setSmallScreen = (smallScreen: boolean) => {
     GlobalState.smallScreen = smallScreen;
     console.log(`Small screen set to: ${smallScreen}`);
@@ -384,15 +291,6 @@ const setRoundId = (roundId: string) => {
 
 const getRoundId = () => {
     return GlobalState.roundId;
-};
-
-const setCurrentRow = (row: number) => {
-    console.log(`Setting current row to: ${row}`);
-    GlobalState.current_row = row;
-};
-
-const getCurrentRow = () => {
-    return GlobalState.current_row;
 };
 
 const setGameMatrix = (matrix: string[][]) => {
@@ -444,23 +342,6 @@ const clearClickedCells = () => {
 
 const getClickedCells = (): Set<string> => {
     return new Set(clickedCells); // Return a copy to prevent external modification
-}
-
-const getUnclickedCells = (): Array<{row: number, col: number}> => {
-    const unclicked: Array<{row: number, col: number}> = [];
-    const gridRows = GlobalState.gridRows;
-    const gridCols = GlobalState.gridCols;
-
-    for (let row = 0; row < gridRows; row++) {
-        for (let col = 0; col < gridCols; col++) {
-            if (!isClickedCell(row, col)) {
-                unclicked.push({ row, col });
-            }
-        }
-    }
-
-    console.log(`🎲 Found ${unclicked.length} unclicked cells out of ${gridRows * gridCols} total`);
-    return unclicked;
 }
 
 const setToken = (token: string) => {
@@ -558,10 +439,7 @@ const triggerPendingGameRestore = async () => {
 export const GlobalState = {
     // Core state
     token: null as string | null,
-    current_row: DEFAULT_ROWS - 1, // Start at bottom row
     game_matrix: [] as string[][],
-    gridCols: DEFAULT_COLS,
-    gridRows: DEFAULT_ROWS,
     multiplier: 1,
     setMultiplier,
     getMultiplier,
@@ -571,6 +449,8 @@ export const GlobalState = {
     getApiUrl,
     setWebSocketUrl,
     getWebSocketUrl,
+    rulesPage: 1,
+    setRulePage,
 
     //icon positions
     setIconPosition,
@@ -601,17 +481,6 @@ export const GlobalState = {
     addBetStepsChangeListener,
     cycleBetUp,
     cycleBetDown,
-
-    // Mines
-    setMinesCount,
-    getMinesCount,
-    getMaxMines,
-    cycleMinesUp,
-    cycleMinesDown,
-    setMinesClickedCount,
-    mineClicked,
-    getMinesClickedCount,
-    resetMinesClickedCount,
     
     // Game state functions
     setGameState,
@@ -629,8 +498,6 @@ export const GlobalState = {
     addRewardChangeListener,
 
     // Grid functions
-    setGridDimensions,
-    getGridDimensions,
     addGridDimensionChangeListener,
     
     // Game data functions
@@ -639,8 +506,6 @@ export const GlobalState = {
     getStakeAmount,
     setRoundId,
     getRoundId,
-    setCurrentRow,
-    getCurrentRow,
     setGameMatrix,
     getGameMatrix,
     setReward,
@@ -656,5 +521,4 @@ export const GlobalState = {
     isClickedCell,
     clearClickedCells,
     getClickedCells,
-    getUnclickedCells,
 };

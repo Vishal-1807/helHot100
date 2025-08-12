@@ -3,24 +3,33 @@ import { createButton } from '../commons/Button';
 import { UI_POS } from '../constants/Positions';
 import { SoundManager } from '../../utils/SoundManager';
 import { ActivityTypes, recordUserActivity } from '../../utils/gameActivityManager';
-import { createSettingsPopup } from '../popups/SettingsPopup';
+import { createCommonPopup } from '../../components';
+import { createAudioSettings } from '../popups/popupContent/audioSettings';
 
-export const createSettingsButton = (appWidth: number, appHeight: number, gameContainerWidth?: number, gameContainerHeight?: number, gameAreaContainer?: Container): Container => {
+export const createSettingsButton = (appWidth: number, appHeight: number, gameContainer: any, appStage?: Container): Container => {
   const container = new Container();
   container.zIndex = 50;
 
+  const bounds = gameContainer.getGameAreaBounds();
+  let gameContainerWidth = bounds.width;
+  let gameContainerHeight = bounds.height;
+
   // Create settings popup (initially hidden)
   let settingsPopup: Container | null = null;
+  let audioSettings: Container | null = null;
 
   const showSettingsPopup = () => {
     if (!settingsPopup) {
       // Use game container dimensions if provided, otherwise fall back to app dimensions
       const popupWidth = gameContainerWidth;
       const popupHeight = gameContainerHeight;
-      settingsPopup = createSettingsPopup(popupWidth, popupHeight, hideSettingsPopup);
+      settingsPopup = createCommonPopup(popupWidth, popupHeight, false, hideSettingsPopup);
+
+      audioSettings =  createAudioSettings(settingsPopup);
+      settingsPopup.addChild(audioSettings);
 
       // Add popup to game area container if available, otherwise to button container
-      const targetContainer = gameAreaContainer || container;
+      const targetContainer = appStage || container;
       targetContainer.addChild(settingsPopup);
     }
     settingsPopup.visible = true;
@@ -48,23 +57,28 @@ export const createSettingsButton = (appWidth: number, appHeight: number, gameCo
     },
   });
   
-  const resize = (newWidth: number, newHeight: number, newGameContainerWidth?: number, newGameContainerHeight?: number) => {
+  const resize = (newWidth: number, newHeight: number, gameContainer: any) => {
     (settingsButton as any).setPosition(newWidth * UI_POS.SETTINGS_BUTTON_X, newHeight * UI_POS.SETTINGS_BUTTON_Y);
     (settingsButton as any).setSize(Math.max(newHeight * UI_POS.SETTINGS_BUTTON_MAX_HEIGHT_RATIO, UI_POS.SETTINGS_BUTTON_MIN_HEIGHT), Math.max(newHeight * UI_POS.SETTINGS_BUTTON_MAX_HEIGHT_RATIO, UI_POS.SETTINGS_BUTTON_MIN_HEIGHT));
 
+    const bounds = gameContainer.getGameAreaBounds();
+    let newGameContainerWidth = bounds.width;
+    let newGameContainerHeight = bounds.height;
     // Update game container dimensions for future popup creation
     if (newGameContainerWidth !== undefined) gameContainerWidth = newGameContainerWidth;
     if (newGameContainerHeight !== undefined) gameContainerHeight = newGameContainerHeight;
 
+    const popupWidth = gameContainerWidth;
+    const popupHeight = gameContainerHeight;
     // Resize popup if it exists (whether visible or not)
     if (settingsPopup) {
-      // Use updated game container dimensions if available
-      const popupWidth = gameContainerWidth;
-      const popupHeight = gameContainerHeight;
-
-      // Call the popup's resize method if it exists
       if (typeof (settingsPopup as any).resize === 'function') {
         (settingsPopup as any).resize(popupWidth, popupHeight);
+      }
+    }
+    if (audioSettings) {
+      if (typeof (audioSettings as any).resize === 'function') {
+        (audioSettings as any).resize(popupWidth, popupHeight);
       }
     }
   };

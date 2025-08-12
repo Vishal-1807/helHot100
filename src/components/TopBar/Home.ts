@@ -11,6 +11,7 @@ export const createHomeButton = (appWidth: number, appHeight: number): Container
   // Default click handler
   let clickHandler = () => {
     console.log('🏠 Home button clicked - no handler set');
+    // calling window function to redirect to home in react
     if (typeof (window as any).redirectToHome === 'function') {
         (window as any).redirectToHome();
     }

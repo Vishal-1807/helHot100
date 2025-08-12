@@ -16,7 +16,6 @@ export async function loadAssets() {
         { alias: 'balanceTab', src: `${ASSET_BASE}assets/BalanceTab.png` },
         { alias: 'home', src: `${ASSET_BASE}assets/Home.png` },
         { alias : 'settings', src: `${ASSET_BASE}assets/Settings.png` },
-        { alias: 'settingsPopup', src: `${ASSET_BASE}assets/SettingsPopup.png` },
         { alias: 'reelColumn', src: `${ASSET_BASE}assets/ReelColumn.png` },
         { alias: 'button', src: `${ASSET_BASE}assets/Button.png` },
         { alias: 'plusButton', src: `${ASSET_BASE}assets/PlusButton.png` },
@@ -25,7 +24,7 @@ export async function loadAssets() {
         { alias: 'Sound', src: `${ASSET_BASE}assets/Sound.png` },
         { alias : 'Rules', src: `${ASSET_BASE}assets/Rules.png` },
         { alias: 'History', src: `${ASSET_BASE}assets/History.png` },
-        { alias: 'bg', src: `${ASSET_BASE}assets/bg.png` },
+        { alias: 'bg', src: `${ASSET_BASE}assets/bganimation.mp4` },
 
         // -------------- SLOT ICONS ----------------- //
         { alias: 'watermelonIcon', src: `${ASSET_BASE}assets/watermelon.png` },
@@ -50,6 +49,22 @@ export async function loadAssets() {
         { alias: 'totalWin', src: `${ASSET_BASE}assets/TotalWin.png` },
         { alias: 'bigWin', src: `${ASSET_BASE}assets/BigWin.png` },
 
+        // ----------------- COMMON POPUP ----------------- //
+        { alias: 'commonPopup', src: `${ASSET_BASE}assets/CommonPopup.png` },
+        { alias: 'previousButton', src: `${ASSET_BASE}assets/previousButton.png` },
+        { alias: 'nextButton', src: `${ASSET_BASE}assets/nextButton.png` },
+
+        // --------------- SETTINGS AUDIO ----------------- //
+        { alias: 'musicButton', src: `${ASSET_BASE}assets/musicButton.png` },
+        { alias: 'soundButton', src: `${ASSET_BASE}assets/soundButton.png` },
+        { alias: 'audioKnob', src: `${ASSET_BASE}assets/audioKnob.png` },
+        { alias: 'audioTrack', src: `${ASSET_BASE}assets/audioTrack.png` },
+
+        // ----------------- RULES PAGES ----------------- //
+        { alias: 'PaylinePage1', src: `${ASSET_BASE}assets/PaylinePage1.png` },
+        { alias: 'PaylinePage2', src: `${ASSET_BASE}assets/PaylinePage2.png` },
+        { alias: 'PaylinePage3', src: `${ASSET_BASE}assets/PaylinePage3.png` },
+        { alias: 'PaylinePage4', src: `${ASSET_BASE}assets/PaylinePage4.png` },
     ]);
 
     console.log('All assets loaded successfully');

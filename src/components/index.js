@@ -1,7 +1,7 @@
 // ------------ TOP BAR ------------- //
 export { default as createBalanceTab } from './TopBar/BalanceTab';
 export { default as createHomeButton } from './TopBar/Home';
-export { default as createSettingsButton } from './TopBar/Settings';
+export { default as createSettingsButton } from './TopBar/SettingsButton';
 export { default as createRulesButton } from './TopBar/RulesButton';
 
 // ------------ BOTTOM BAR ------------- //
@@ -13,4 +13,7 @@ export { default as createAutoSpinButton } from './BottomBar/AutoSpinButton';
 // ------------ REEL CONTAINER ------------ //
 export { default as createReelColumn } from './ReelContainer/ReelColumn';
 export { default as createReelContainer } from './ReelContainer/ReelContainer';
+
+// ----------- POPUP CONTAINER ------------ //
+export { default as createCommonPopup } from './commons/CommonPopup';
 
