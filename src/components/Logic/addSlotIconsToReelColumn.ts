@@ -3,6 +3,7 @@ import { createButton } from '../commons/Button';
 import {TOTAL_REELS, ICONS_PER_REEL} from '../constants/GameConstants';
 import { getSecureRandomNumber } from '../commons/getRandom';
 import { GlobalState } from '../../globals/gameState';
+import { createSpriteFromLoadedAssets } from '../commons';
 
 export const addSlotIcons = (reelColumn: any, reelColumnContainer: any, columnNumber: number, icons: any[]) => {
     const slotIcons: any[] = [];
@@ -10,13 +11,14 @@ export const addSlotIcons = (reelColumn: any, reelColumnContainer: any, columnNu
     const ICON_HEIGHT = reelColumn.height / ICONS_PER_REEL;
 
     for (let i = 0; i < ICONS_PER_REEL; i++) {
+        let icon = icons[Math.floor(getSecureRandomNumber(0, icons.length-1))]
         const slotIcon = createButton({
             x: reelColumn.x,
             y: reelColumn.y - reelColumn.height/2 + (ICON_HEIGHT/2) + (ICON_HEIGHT * i),
-            width: ICON_HEIGHT * 1.05,
+            width: reelColumn.width * 0.98,
             anchor: { x: 0.5, y: 0.5 },
             height: ICON_HEIGHT * 1.05,
-            texture: Assets.get(icons[Math.floor(getSecureRandomNumber(0, icons.length-1))]),
+            texture: icon == 'lemonWin' || icon == 'plumWin' ? createSpriteFromLoadedAssets(icon, {width: ICON_HEIGHT * 1.05, height: ICON_HEIGHT * 1.05}) : Assets.get(icon),
             shadow: false,
             onClick: () => {
                 console.log('Slot icon clicked');

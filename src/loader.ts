@@ -8,7 +8,6 @@ export async function loadAssets() {
     
     // Load all assets including the font file
     await Assets.load([
-        // { alias: 'diamondSprite', src: `${ASSET_BASE}sprites/diamond.json` },
         { alias: 'spinButton', src: `${ASSET_BASE}assets/SpinButton.png` },
         { alias: 'autoSpinButton', src: `${ASSET_BASE}assets/AutoSpinButton.png` },
         { alias: 'valueBar', src: `${ASSET_BASE}assets/ValueBar.png` },
@@ -30,6 +29,11 @@ export async function loadAssets() {
         { alias: 'lemonIcon', src: `${ASSET_BASE}assets/lemon.png` },
         { alias: 'scatterIcon', src: `${ASSET_BASE}assets/scatter.png` },
         { alias: 'wildIcon', src: `${ASSET_BASE}assets/wild.png` },
+
+        // -------------- SLOT WIN SPRITES ----------------- //
+        { alias: 'lemonWin', src: `${ASSET_BASE}sprites/lemon.json` },
+        { alias: 'plumWin', src: `${ASSET_BASE}sprites/plum.json` },
+
         // ---------------- BLURRED SLOT ICONS ----------------- //
         { alias: 'watermelonBlur', src: `${ASSET_BASE}assets/watermelonBlur.png` },
         { alias: 'sevenBlur', src: `${ASSET_BASE}assets/sevenBlur.png` },

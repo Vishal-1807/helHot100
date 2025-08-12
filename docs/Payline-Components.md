@@ -448,6 +448,292 @@ const diagonal = [[0, 0], [1, 1], [2, 2], [1, 3], [0, 4]];
 const vShape = [[0, 0], [1, 1], [2, 2], [1, 3], [0, 4]];
 ```
 
+## Icon Position Management
+
+**IMPORTANT**: For paylines to work correctly, you must save and manage the actual pixel positions of your slot machine icons. The payline system uses these saved positions to draw lines between the correct screen coordinates.
+
+### Setting Up Icon Position Storage with GlobalState
+
+**Recommended Approach**: Use GlobalState to store icon positions for better organization and easier access throughout your application:
+
+```jsx
+// Add to your GlobalState class/object
+GlobalState.iconPositions = {};
+
+// Function to save icon position in GlobalState
+const saveIconPosition = (row, col, x, y) => {
+  if (!GlobalState.iconPositions[row]) {
+    GlobalState.iconPositions[row] = {};
+  }
+  GlobalState.iconPositions[row][col] = { x, y };
+  console.log(`💾 Saved icon position [${row},${col}] at (${x}, ${y}) in GlobalState`);
+};
+
+// Function to get icon position from GlobalState
+const getIconPosition = (row, col) => {
+  if (GlobalState.iconPositions[row] && GlobalState.iconPositions[row][col]) {
+    return GlobalState.iconPositions[row][col];
+  }
+  console.warn(`⚠️ No position saved for icon [${row},${col}] in GlobalState`);
+  return null;
+};
+
+// Alternative: Add methods directly to GlobalState
+GlobalState.setIconPosition = (row, col, x, y) => {
+  if (!GlobalState.iconPositions[row]) {
+    GlobalState.iconPositions[row] = {};
+  }
+  GlobalState.iconPositions[row][col] = { x, y };
+};
+
+GlobalState.getIconPosition = (row, col) => {
+  if (GlobalState.iconPositions[row] && GlobalState.iconPositions[row][col]) {
+    return GlobalState.iconPositions[row][col];
+  }
+  return null;
+};
+```
+
+### Saving Icon Positions During Slot Creation
+
+When creating your slot machine icons, save their positions in GlobalState:
+
+```jsx
+// Example slot machine creation using GlobalState
+const createSlotMachine = (appWidth, appHeight) => {
+  const slotContainer = new Container();
+
+  // Initialize icon positions in GlobalState if not already done
+  if (!GlobalState.iconPositions) {
+    GlobalState.iconPositions = {};
+  }
+
+  // Slot configuration
+  const rows = 3;
+  const cols = 5;
+  const iconWidth = 80;
+  const iconHeight = 80;
+  const spacing = 10;
+
+  // Calculate starting position to center the grid
+  const totalWidth = (cols * iconWidth) + ((cols - 1) * spacing);
+  const totalHeight = (rows * iconHeight) + ((rows - 1) * spacing);
+  const startX = (appWidth - totalWidth) / 2;
+  const startY = (appHeight - totalHeight) / 2;
+
+  // Create icons and save positions in GlobalState
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      // Calculate icon position
+      const iconX = startX + (col * (iconWidth + spacing)) + (iconWidth / 2);
+      const iconY = startY + (row * (iconHeight + spacing)) + (iconHeight / 2);
+
+      // Create icon sprite
+      const icon = new Sprite(Assets.get('slotIcon'));
+      icon.width = iconWidth;
+      icon.height = iconHeight;
+      icon.anchor.set(0.5, 0.5);
+      icon.x = iconX;
+      icon.y = iconY;
+
+      // IMPORTANT: Save the icon position in GlobalState for paylines
+      GlobalState.setIconPosition(row, col, iconX, iconY);
+      // Or using the helper function:
+      // saveIconPosition(row, col, iconX, iconY);
+
+      slotContainer.addChild(icon);
+    }
+  }
+
+  console.log('🎰 Slot machine created with positions saved in GlobalState');
+  return slotContainer;
+};
+```
+
+### Alternative: Using Icon References in GlobalState
+
+You can also store direct references to icon sprites in GlobalState:
+
+```jsx
+// Initialize icon sprites storage in GlobalState
+GlobalState.iconSprites = {};
+
+const saveIconSprite = (row, col, sprite) => {
+  if (!GlobalState.iconSprites[row]) {
+    GlobalState.iconSprites[row] = {};
+  }
+  GlobalState.iconSprites[row][col] = sprite;
+};
+
+const getIconSprite = (row, col) => {
+  if (GlobalState.iconSprites[row] && GlobalState.iconSprites[row][col]) {
+    return GlobalState.iconSprites[row][col];
+  }
+  return null;
+};
+
+// Add methods directly to GlobalState
+GlobalState.setIconSprite = (row, col, sprite) => {
+  if (!GlobalState.iconSprites[row]) {
+    GlobalState.iconSprites[row] = {};
+  }
+  GlobalState.iconSprites[row][col] = sprite;
+};
+
+GlobalState.getIconSprite = (row, col) => {
+  if (GlobalState.iconSprites[row] && GlobalState.iconSprites[row][col]) {
+    return GlobalState.iconSprites[row][col];
+  }
+  return null;
+};
+
+// During slot creation
+const icon = new Sprite(Assets.get('slotIcon'));
+icon.x = iconX;
+icon.y = iconY;
+GlobalState.setIconSprite(row, col, icon); // Save sprite reference in GlobalState
+
+// Later, get position from sprite stored in GlobalState
+const getIconPositionFromSprite = (row, col) => {
+  const sprite = GlobalState.getIconSprite(row, col);
+  return sprite ? { x: sprite.x, y: sprite.y } : null;
+};
+```
+
+### Responsive Position Updates
+
+Update icon positions in GlobalState when screen size changes:
+
+```jsx
+const updateIconPositions = (newAppWidth, newAppHeight) => {
+  const rows = 3;
+  const cols = 5;
+  const iconWidth = 80;
+  const iconHeight = 80;
+  const spacing = 10;
+
+  // Recalculate positions for new screen size
+  const totalWidth = (cols * iconWidth) + ((cols - 1) * spacing);
+  const totalHeight = (rows * iconHeight) + ((rows - 1) * spacing);
+  const startX = (newAppWidth - totalWidth) / 2;
+  const startY = (newAppHeight - totalHeight) / 2;
+
+  // Update all icon positions in GlobalState
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const iconX = startX + (col * (iconWidth + spacing)) + (iconWidth / 2);
+      const iconY = startY + (row * (iconHeight + spacing)) + (iconHeight / 2);
+
+      // Update saved position in GlobalState
+      GlobalState.setIconPosition(row, col, iconX, iconY);
+
+      // Update sprite position if using sprite references in GlobalState
+      const sprite = GlobalState.getIconSprite(row, col);
+      if (sprite) {
+        sprite.x = iconX;
+        sprite.y = iconY;
+      }
+    }
+  }
+
+  console.log('📱 Icon positions updated in GlobalState for new screen size');
+};
+
+// Handle window resize
+window.addEventListener('resize', () => {
+  updateIconPositions(app.screen.width, app.screen.height);
+  // Recreate any active paylines with new positions from GlobalState
+});
+```
+
+### Payline Integration with GlobalState Positions
+
+The payline system automatically uses positions saved in GlobalState:
+
+```jsx
+// The payline system looks for positions in this order:
+// 1. GlobalState.iconPositions[row][col] - saved pixel positions
+// 2. GlobalState.iconSprites[row][col] - sprite references
+// 3. window.iconPositions[row][col] - fallback to window storage
+// 4. window.iconSprites[row][col] - fallback sprite references
+// 5. Fallback coordinates - for testing/debugging
+
+// Example: Create payline using positions saved in GlobalState
+const winningPositions = [[0, 0], [1, 1], [2, 2]];
+const payline = createPayline(winningPositions, {
+  color: 0xFF0000,
+  width: 5,
+  glow: true
+});
+
+// The payline will automatically connect the icon positions from GlobalState
+console.log('✨ Payline created using GlobalState positions');
+```
+
+### Debugging Icon Positions
+
+Add debugging tools to verify positions are saved correctly in GlobalState:
+
+```jsx
+// Debug function to visualize positions saved in GlobalState
+const debugIconPositions = (app) => {
+  const debugContainer = new Container();
+
+  if (!GlobalState.iconPositions) {
+    console.warn('⚠️ No icon positions found in GlobalState');
+    return;
+  }
+
+  Object.keys(GlobalState.iconPositions).forEach(row => {
+    Object.keys(GlobalState.iconPositions[row]).forEach(col => {
+      const pos = GlobalState.iconPositions[row][col];
+
+      // Create debug marker
+      const marker = new Graphics();
+      marker.beginFill(0xFF0000, 0.8);
+      marker.drawCircle(0, 0, 5);
+      marker.endFill();
+      marker.x = pos.x;
+      marker.y = pos.y;
+
+      debugContainer.addChild(marker);
+
+      // Add position label
+      const label = new Text(`[${row},${col}]`, {
+        fontSize: 12,
+        fill: 0xFFFFFF
+      });
+      label.x = pos.x + 10;
+      label.y = pos.y - 10;
+      debugContainer.addChild(label);
+    });
+  });
+
+  app.stage.addChild(debugContainer);
+
+  console.log('🔍 Debug markers showing GlobalState icon positions');
+
+  // Remove debug markers after 3 seconds
+  setTimeout(() => {
+    app.stage.removeChild(debugContainer);
+    debugContainer.destroy({ children: true });
+  }, 3000);
+};
+
+// Alternative: Log all positions to console
+const logIconPositions = () => {
+  console.log('📍 Icon positions in GlobalState:', GlobalState.iconPositions);
+
+  if (GlobalState.iconSprites) {
+    console.log('🎭 Icon sprites in GlobalState:', GlobalState.iconSprites);
+  }
+};
+
+// Usage: Call these to verify positions are saved in GlobalState
+debugIconPositions(app);
+logIconPositions();
+```
+
 ## Animation System
 
 ### Pulse Animation
@@ -477,6 +763,45 @@ const glowingPayline = createPayline(positions, {
 ```
 
 ## Usage Tips
+
+### Icon Position Requirements
+
+**Before using paylines, ensure icon positions are saved in GlobalState:**
+
+```jsx
+// ✅ CORRECT: Save positions in GlobalState during slot creation
+const createSlot = () => {
+  // ... create icons ...
+  GlobalState.setIconPosition(row, col, iconX, iconY);
+  // ... then paylines will work
+};
+
+// ❌ INCORRECT: Using paylines without saved positions in GlobalState
+const payline = createPayline([[0,0], [1,1]]); // Will use fallback coordinates
+
+// ✅ CORRECT: Verify positions in GlobalState before creating paylines
+const createWinPayline = (positions) => {
+  const allPositionsSaved = positions.every(([row, col]) => {
+    return GlobalState.getIconPosition(row, col) !== null;
+  });
+
+  if (!allPositionsSaved) {
+    console.error('❌ Cannot create payline: Icon positions not saved in GlobalState');
+    return null;
+  }
+
+  return createPayline(positions, { color: 0xFF0000, glow: true });
+};
+
+// ✅ BEST PRACTICE: Initialize GlobalState icon positions early
+const initializeGame = () => {
+  // Initialize icon positions storage in GlobalState
+  GlobalState.iconPositions = {};
+  GlobalState.iconSprites = {};
+
+  console.log('🎮 GlobalState initialized for icon position management');
+};
+```
 
 ### Performance Optimization
 
@@ -535,10 +860,183 @@ if (DEBUG_PAYLINES) {
 
 ## Common Patterns
 
+### Complete Slot Machine with GlobalState Paylines
+
+```jsx
+class SlotMachine {
+  constructor(appWidth, appHeight) {
+    this.appWidth = appWidth;
+    this.appHeight = appHeight;
+    this.container = new Container();
+    this.activePaylines = [];
+
+    // Initialize GlobalState for icon positions
+    this.initializeGlobalState();
+    this.createSlotGrid();
+  }
+
+  initializeGlobalState() {
+    if (!GlobalState.iconPositions) {
+      GlobalState.iconPositions = {};
+    }
+    if (!GlobalState.iconSprites) {
+      GlobalState.iconSprites = {};
+    }
+    console.log('🎮 SlotMachine: GlobalState initialized for paylines');
+  }
+
+  createSlotGrid() {
+    const rows = 3;
+    const cols = 5;
+    const iconSize = 80;
+    const spacing = 10;
+
+    // Calculate grid positioning
+    const totalWidth = (cols * iconSize) + ((cols - 1) * spacing);
+    const totalHeight = (rows * iconSize) + ((rows - 1) * spacing);
+    const startX = (this.appWidth - totalWidth) / 2;
+    const startY = (this.appHeight - totalHeight) / 2;
+
+    // Create and position icons
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const iconX = startX + (col * (iconSize + spacing)) + (iconSize / 2);
+        const iconY = startY + (row * (iconSize + spacing)) + (iconSize / 2);
+
+        const icon = new Sprite(Assets.get('slotIcon'));
+        icon.width = iconSize;
+        icon.height = iconSize;
+        icon.anchor.set(0.5, 0.5);
+        icon.x = iconX;
+        icon.y = iconY;
+
+        // CRITICAL: Save position in GlobalState for paylines
+        GlobalState.setIconPosition(row, col, iconX, iconY);
+        GlobalState.setIconSprite(row, col, icon);
+
+        this.container.addChild(icon);
+      }
+    }
+
+    console.log('🎰 Slot grid created with positions saved in GlobalState');
+  }
+
+  showWinningPaylines(winningLines) {
+    // Verify all positions are available in GlobalState
+    const allPositionsValid = winningLines.every(line =>
+      line.positions.every(([row, col]) =>
+        GlobalState.getIconPosition(row, col) !== null
+      )
+    );
+
+    if (!allPositionsValid) {
+      console.error('❌ Cannot show paylines: Missing positions in GlobalState');
+      return;
+    }
+
+    // Clear existing paylines
+    this.clearPaylines();
+
+    // Create new paylines using GlobalState positions
+    winningLines.forEach((lineConfig, index) => {
+      setTimeout(() => {
+        const payline = createPayline(lineConfig.positions, {
+          color: lineConfig.color || 0xFFD700,
+          width: 6,
+          glow: true,
+          pulse: true
+        });
+
+        this.activePaylines.push(payline);
+        this.container.addChild(payline);
+      }, index * 200); // Stagger animations
+    });
+
+    console.log('✨ Paylines created using GlobalState positions');
+  }
+
+  clearPaylines() {
+    this.activePaylines.forEach(payline => {
+      this.container.removeChild(payline);
+      payline.destroy({ children: true });
+    });
+    this.activePaylines = [];
+  }
+
+  // Method to update positions on resize
+  resize(newWidth, newHeight) {
+    this.appWidth = newWidth;
+    this.appHeight = newHeight;
+
+    // Update icon positions in GlobalState
+    this.updateIconPositions();
+
+    // Recreate active paylines with new positions
+    if (this.activePaylines.length > 0) {
+      const currentLines = this.activePaylines.map(payline => ({
+        positions: payline.positions, // Assuming positions are stored
+        color: payline.color
+      }));
+      this.showWinningPaylines(currentLines);
+    }
+  }
+
+  updateIconPositions() {
+    const rows = 3;
+    const cols = 5;
+    const iconSize = 80;
+    const spacing = 10;
+
+    const totalWidth = (cols * iconSize) + ((cols - 1) * spacing);
+    const totalHeight = (rows * iconSize) + ((rows - 1) * spacing);
+    const startX = (this.appWidth - totalWidth) / 2;
+    const startY = (this.appHeight - totalHeight) / 2;
+
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const iconX = startX + (col * (iconSize + spacing)) + (iconSize / 2);
+        const iconY = startY + (row * (iconSize + spacing)) + (iconSize / 2);
+
+        // Update position in GlobalState
+        GlobalState.setIconPosition(row, col, iconX, iconY);
+
+        // Update sprite position
+        const sprite = GlobalState.getIconSprite(row, col);
+        if (sprite) {
+          sprite.x = iconX;
+          sprite.y = iconY;
+        }
+      }
+    }
+  }
+}
+
+// Usage
+const slotMachine = new SlotMachine(800, 600);
+app.stage.addChild(slotMachine.container);
+
+// Show winning paylines
+const winningLines = [
+  { positions: [[0, 0], [0, 1], [0, 2]], color: 0xFF0000 },
+  { positions: [[1, 0], [1, 1], [1, 2]], color: 0x00FF00 }
+];
+slotMachine.showWinningPaylines(winningLines);
+```
+
 ### Win Animation Sequence
 
 ```jsx
 const showWinSequence = async (winningPaylines) => {
+  // Verify all positions are saved before creating paylines
+  const allPositionsValid = winningPaylines.every(line =>
+    line.positions.every(([row, col]) => getIconPosition(row, col) !== null)
+  );
+
+  if (!allPositionsValid) {
+    console.error('❌ Cannot show win sequence: Missing icon positions');
+    return;
+  }
+
   const paylines = [];
 
   // Show paylines one by one

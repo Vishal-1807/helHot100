@@ -389,8 +389,11 @@ interface SpriteOptions {
 ```typescript
 import { createSpriteFromLoadedAssets } from './commons/Sprites';
 
-// Create animated sprite
-const coinSprite = await createSpriteFromLoadedAssets(
+// Load spritesheet first
+await PIXI.Assets.load('coinAnimation.json');
+
+// Create animated sprite (synchronous)
+const coinSprite = createSpriteFromLoadedAssets(
   'coinAnimation',               // spritesheet name
   {
     x: 100,

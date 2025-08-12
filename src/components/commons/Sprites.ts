@@ -15,11 +15,11 @@ type SpriteOptions = {
   center?: boolean;
 };
 
-export const createSpriteFromLoadedAssets = async (
+export const createSpriteFromLoadedAssets = (
   jsonName: string,
   options: SpriteOptions = {},
   app?: Application       // Optional PIXI Application instance (for centering)
-): Promise<AnimatedSprite> => {
+): AnimatedSprite => {
   const {
     x,
     y,
@@ -36,46 +36,42 @@ export const createSpriteFromLoadedAssets = async (
 
   const sheet = Assets.get<Spritesheet>(jsonName);
 
-  return new Promise((resolve) => {
-   
-      let textures: Texture[];
+  let textures: Texture[];
 
-      if (animationName && sheet.animations[animationName]) {
-        textures = sheet.animations[animationName];
-      } else {
-        textures = Object.values(sheet.textures);
-      }
+  if (animationName && sheet.animations[animationName]) {
+    textures = sheet.animations[animationName];
+  } else {
+    textures = Object.values(sheet.textures);
+  }
 
-      const anim = new AnimatedSprite(textures);
-      anim.anchor.set(anchor);
-      anim.animationSpeed = animationSpeed;
-      anim.loop = loop;
+  const anim = new AnimatedSprite(textures);
+  anim.anchor.set(anchor);
+  anim.animationSpeed = animationSpeed;
+  anim.loop = loop;
 
-      if (autoplay) {
-        anim.play();
-      }
+  if (autoplay) {
+    anim.play();
+  }
 
-      // Resize using width/height if given
-      if (width && height) {
-        const originalWidth = anim.width;
-        const originalHeight = anim.height;
-        anim.scale.set(width / originalWidth, height / originalHeight);
-      } else {
-        anim.scale.set(scale);
-      }
+  // Resize using width/height if given
+  if (width && height) {
+    const originalWidth = anim.width;
+    const originalHeight = anim.height;
+    anim.scale.set(width / originalWidth, height / originalHeight);
+  } else {
+    anim.scale.set(scale);
+  }
 
-      // Center or position
-      if (center && app) {
-        anim.x = app.screen.width / 2;
-        anim.y = app.screen.height / 2;
-      } else {
-        anim.x = x ?? 0;
-        anim.y = y ?? 0;
-      }
+  // Center or position
+  if (center && app) {
+    anim.x = app.screen.width / 2;
+    anim.y = app.screen.height / 2;
+  } else {
+    anim.x = x ?? 0;
+    anim.y = y ?? 0;
+  }
 
-      resolve(anim);
-    });
-
+  return anim;
 };
 
 export default createSpriteFromLoadedAssets;
