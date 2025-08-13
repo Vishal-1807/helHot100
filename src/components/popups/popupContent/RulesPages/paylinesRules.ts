@@ -15,6 +15,7 @@ export const createPaylinesPage = (settingsPopup: Container, texture): Container
     texture: texture,
     anchor: { x: 0.5, y: 0.5 },
     shadow: false,
+    hoverTint: 'none',
   });
   paylinesImageRef = paylinesImage;
 

@@ -24,6 +24,7 @@ export interface ButtonOptions {
   bold?: boolean;
   italic?: boolean;
   shadow?: boolean; // New shadow option
+  tint?: number | string;
 }
 
 /**
@@ -65,6 +66,7 @@ export function createButton(options: ButtonOptions = {}): Container {
     bold = false,
     italic = false,
     shadow = true, // Default shadow to true
+    tint = '#ffffff',
   } = options;
 
   // State
@@ -110,6 +112,8 @@ export function createButton(options: ButtonOptions = {}): Container {
       shadowGraphics.endFill();
     }
   };
+
+  button.tint = parseColor(tint);
 
   updateShadow();
   shadowGraphics.zIndex = -1;

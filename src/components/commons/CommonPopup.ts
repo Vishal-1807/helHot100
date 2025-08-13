@@ -60,7 +60,7 @@ export const createCommonPopup = (appWidth: number, appHeight: number, multipleP
   container.addChild(closeButton);
 
   const previousPage = createButton({
-    x: settingsPopup.container.x - (settingsPopup.container.width/2) - (settingsPopup.container.height * UI_POS.NAVIGATION_BUTTON_X),
+    x: settingsPopup.container.x - (settingsPopup.container.width/2) - (settingsPopup.container.width * UI_POS.NAVIGATION_BUTTON_X),
     y: settingsPopup.container.y,
     width: settingsPopup.container.height * UI_POS.NAVIGATION_BUTTON_WIDTH,
     height: settingsPopup.container.height * UI_POS.NAVIGATION_BUTTON_HEIGHT,
@@ -78,7 +78,7 @@ export const createCommonPopup = (appWidth: number, appHeight: number, multipleP
   container.addChild(previousPage);
 
   const nextPage = createButton({
-    x: settingsPopup.container.x + (settingsPopup.container.width/2) + (settingsPopup.container.height * UI_POS.NAVIGATION_BUTTON_X),
+    x: settingsPopup.container.x + (settingsPopup.container.width/2) + (settingsPopup.container.width * UI_POS.NAVIGATION_BUTTON_X),
     y: settingsPopup.container.y,
     width: settingsPopup.container.height * UI_POS.NAVIGATION_BUTTON_WIDTH,
     height: settingsPopup.container.height * UI_POS.NAVIGATION_BUTTON_HEIGHT,
