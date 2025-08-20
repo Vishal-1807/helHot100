@@ -1,14 +1,9 @@
-import { Container, Assets, Application } from 'pixi.js';
+import { Container, Assets } from 'pixi.js';
 import { createButton } from '../commons';
 import { UI_POS } from '../constants/Positions';
-import { UI_THEME } from '../constants/UIThemeColors';
 import { SoundManager } from '../../utils/SoundManager';
 import { ActivityTypes, recordUserActivity } from '../../utils/gameActivityManager';
-import { ICONS_PER_REEL, TOTAL_REELS, WIN_POPUP_TYPES } from '../constants/GameConstants';
-import { ShowWinPopup } from '../popups/WinPopup';
-import { createMultiplePayline } from '../commons';
-import { animateReelSpin, stopReelAnimation, stopReelAnimationSequential } from '../Logic/reelAnimation';
-import { tempSlotIconsNames } from '../constants/GameConstants';
+import { spinClickHandler } from '../Logic/spinClickHandler';
 
 export const createSpinButton = (appWidth: number, appHeight: number, gameContainer: any, reelContainer: any): Container => {
   const container = new Container();
@@ -24,57 +19,9 @@ export const createSpinButton = (appWidth: number, appHeight: number, gameContai
     height: Math.max(appHeight * UI_POS.SPIN_BUTTON_MAX_HEIGHT_RATIO, UI_POS.SPIN_BUTTON_MIN_HEIGHT),
     borderRadius: 10,
     texture: Assets.get('spinButton'),
-    onClick: () => {
+    onClick: async () => {
+      await spinClickHandler(reelContainer, gameContainer, false);
       console.log('Spin button clicked - starting reel animation');
-
-      // Stop any existing animation first
-      stopReelAnimation({ reelContainer });
-
-      // Generate random final icons for each reel column (5 reels, 4 icons each)
-      const finalIcons: string[][] = [];
-      for (let col = 0; col < TOTAL_REELS; col++) {
-        const columnIcons: string[] = [];
-        for (let row = 0; row < ICONS_PER_REEL; row++) {
-          const randomIcon = tempSlotIconsNames[Math.floor(Math.random() * tempSlotIconsNames.length)];
-          columnIcons.push(randomIcon);
-        }
-        finalIcons.push(columnIcons);
-      }
-
-      // Start the animated reel spin with custom speed and duration
-      animateReelSpin({
-        reelContainer,
-        duration: 1300,
-        speed: 2.5 // 2.5x speed for faster spinning
-      });
-
-      // After animation completes, stop reels sequentially from left to right
-      setTimeout(() => {
-        console.log('Starting sequential reel stop - left to right');
-        // Stop reels sequentially with custom bounce settings
-        stopReelAnimationSequential({
-          reelContainer,
-          finalIcons,
-          delayBetweenReels: 300,
-          bounceHeight: 110,
-          bounceDuration: 300,
-          bounceDelay: 30
-        });
-
-        // After all reels have stopped (5 reels * 300ms delay = 1.5 seconds)
-        setTimeout(() => {
-          console.log('All reels stopped - checking for wins');
-          // Here you can add logic to:
-          // 1. Check for winning combinations
-          // 2. Show win popup if needed
-          // 3. Update balance, etc.
-
-          // Example: Show win popup (uncomment if needed)
-          // const parentContainer = gameContainer.container || gameContainer;
-          // ShowWinPopup(parentContainer, WIN_POPUP_TYPES.TOTAL_WIN, 100);
-        }, 2000); // Wait for all reels to stop
-      }, 1000);
-
       // -------- payline example --------- //
       // multiplePayline = createMultiplePayline([
       //   {
@@ -134,6 +81,20 @@ export const createSpinButton = (appWidth: number, appHeight: number, gameContai
 
   // Add resize method to container for external access
   (container as any).resize = resize;
+
+  // Expose setDisabled and getDisabled methods for button state manager
+  (container as any).setDisabled = (disabled: boolean) => {
+    if (spinButton && typeof (spinButton as any).setDisabled === 'function') {
+      (spinButton as any).setDisabled(disabled);
+    }
+  };
+
+  (container as any).getDisabled = (): boolean => {
+    if (spinButton && typeof (spinButton as any).getDisabled === 'function') {
+      return (spinButton as any).getDisabled();
+    }
+    return false;
+  };
 
   return container;
 }

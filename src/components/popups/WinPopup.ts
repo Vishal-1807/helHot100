@@ -139,7 +139,7 @@ export const ShowWinPopup = (
     gsap.to(winPopup.scale, {
       x: 1,
       y: 1,
-      duration: 0.5,
+      duration: 0.3,
       ease: 'back.out(1.7)',
       onComplete: () => {
         console.log('✅ Zoom-in animation completed, waiting 3 seconds...');
@@ -149,7 +149,7 @@ export const ShowWinPopup = (
           gsap.to(winPopup.scale, {
             x: 0,
             y: 0,
-            duration: 0.3,
+            duration: 0.2,
             ease: 'back.in(1.7)',
             onComplete: () => {
               console.log('✅ Zoom-out animation completed, cleaning up...');

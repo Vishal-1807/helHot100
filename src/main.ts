@@ -240,7 +240,7 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
     betTab = createBetTab(bottomBarRef.container.width, bottomBarRef.container.height);
     winningsTab = createWinningsTab(bottomBarRef.container.width, bottomBarRef.container.height);
     spinButton = createSpinButton(bottomBarRef.container.width, bottomBarRef.container.height, gameContainer, reelContainer);
-    autoSpinButton = createAutoSpinButton(bottomBarRef.container.width, bottomBarRef.container.height);
+    autoSpinButton = createAutoSpinButton(bottomBarRef.container.width, bottomBarRef.container.height, gameContainer, reelContainer);
 
     bottomBarRef.container.addChild(betTab);
     bottomBarRef.container.addChild(winningsTab);
@@ -248,6 +248,42 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
     bottomBarRef.container.addChild(autoSpinButton);
 
     gameBoardRef.container.sortableChildren = true;
+
+    // Initialize button state manager with all button references
+    initializeButtonStateManager({
+      homeButton: homeButton,
+      settingsButton: settingsButton,
+      rulesButton: rulesButton,
+      balanceTab: balanceTab,
+      spinButton: spinButton,
+      autoSpinButton: autoSpinButton,
+      winningsTab: winningsTab
+    });
+
+    // Setup game state listeners
+    setupGameStateListeners();
+
+    console.log('🔘 Button state manager initialized and listeners setup');
+
+    // // Debug: Test button references and methods
+    // console.log('🔧 DEBUG: Testing button references:');
+    // console.log('Home button setDisabled:', typeof homeButton?.setDisabled);
+    // console.log('Settings button setDisabled:', typeof settingsButton?.setDisabled);
+    // console.log('Rules button setDisabled:', typeof rulesButton?.setDisabled);
+    // console.log('Spin button setDisabled:', typeof spinButton?.setDisabled);
+    // console.log('Balance tab setDisabled:', typeof balanceTab?.setDisabled);
+    // console.log('Auto spin button setDisabled:', typeof autoSpinButton?.setDisabled);
+    // console.log('Winnings tab setDisabled:', typeof winningsTab?.setDisabled);
+
+    // // Test calling setDisabled on one button
+    // console.log('🔧 DEBUG: Testing setDisabled call on home button...');
+    // if (homeButton?.setDisabled) {
+    //   homeButton.setDisabled(true);
+    //   setTimeout(() => {
+    //     homeButton.setDisabled(false);
+    //     console.log('🔧 DEBUG: Home button disable/enable test completed');
+    //   }, 2000);
+    // }
   };
 
   // STEP 4: Remove splash screen
@@ -274,9 +310,8 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
   // Execute the main initialization flow
   const executeMainFlow = async (): Promise<void> => {
     try {
-      removeSplashScreen();
       // Step 1: Get player balance
-      // await getBalance();
+      await getBalance();
 
       // Step 2: Check for pending games
       // const hasPendingGame = await checkAndHandlePendingGames();

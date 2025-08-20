@@ -41,6 +41,20 @@ export const createHomeButton = (appWidth: number, appHeight: number): Container
   // Add resize method to container for external access
   (container as any).resize = resize;
 
+  // Expose setDisabled and getDisabled methods for button state manager
+  (container as any).setDisabled = (disabled: boolean) => {
+    if (homeButton && typeof (homeButton as any).setDisabled === 'function') {
+      (homeButton as any).setDisabled(disabled);
+    }
+  };
+
+  (container as any).getDisabled = (): boolean => {
+    if (homeButton && typeof (homeButton as any).getDisabled === 'function') {
+      return (homeButton as any).getDisabled();
+    }
+    return false;
+  };
+
   return container;
 };
 

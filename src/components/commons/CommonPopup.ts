@@ -26,8 +26,8 @@ export const createCommonPopup = (appWidth: number, appHeight: number, multipleP
   container.addChild(backgroundOverlay);
 
   const settingsPopup = createSimplePositionedContainer({
-    gameContainerWidth: appWidth * UI_POS.SETTINGS_POPUP_WIDTH,
-    gameContainerHeight: appHeight * UI_POS.SETTINGS_POPUP_HEIGHT,
+    gameContainerWidth: appWidth * UI_POS.COMMON_POPUP_WIDTH,
+    gameContainerHeight: appHeight * UI_POS.COMMON_POPUP_HEIGHT,
     width: '80%',
     height: '80%',
     x: appWidth * 0.5,

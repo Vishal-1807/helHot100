@@ -90,6 +90,20 @@ export const createSettingsButton = (appWidth: number, appHeight: number, gameCo
   (container as any).hideSettingsPopup = hideSettingsPopup;
   (container as any).showSettingsPopup = showSettingsPopup;
 
+  // Expose setDisabled and getDisabled methods for button state manager
+  (container as any).setDisabled = (disabled: boolean) => {
+    if (settingsButton && typeof (settingsButton as any).setDisabled === 'function') {
+      (settingsButton as any).setDisabled(disabled);
+    }
+  };
+
+  (container as any).getDisabled = (): boolean => {
+    if (settingsButton && typeof (settingsButton as any).getDisabled === 'function') {
+      return (settingsButton as any).getDisabled();
+    }
+    return false;
+  };
+
   return container;
 };
 

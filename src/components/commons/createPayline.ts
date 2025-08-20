@@ -221,6 +221,7 @@ export const createMultiplePayline = (
 ): Container => {
   const multiPaylineContainer = new Container();
   multiPaylineContainer.sortableChildren = true;
+  multiPaylineContainer.zIndex = Z_INDEX.PAYLINES; // Set proper z-index for clearPaylines to work
 
   paylines.forEach((payline, index) => {
     // Use manual offset if provided, otherwise calculate sequential offset

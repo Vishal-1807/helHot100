@@ -354,7 +354,7 @@ export const stopSingleReel = (params: StopSingleReelParams) => {
 
   if (finalIcons) {
     const reelColumnButton = reelColumnContainer.children[0];
-    const { slotIcons, resizeSlotIcons } = addSlotIcons(reelColumnButton, reelColumnContainer, columnIndex, finalIcons);
+    const { slotIcons, resizeSlotIcons } = addSlotIcons(reelColumnButton, reelColumnContainer, columnIndex, finalIcons, true);
 
     // Add bounce effect to the final icons
     setTimeout(() => {

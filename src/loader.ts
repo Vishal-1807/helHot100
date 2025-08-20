@@ -9,7 +9,8 @@ export async function loadAssets() {
     // Load all assets including the font file
     await Assets.load([
         { alias: 'spinButton', src: `${ASSET_BASE}assets/SpinButton.png` },
-        { alias: 'autoSpinButton', src: `${ASSET_BASE}assets/AutoSpinButton.png` },
+        { alias: 'autoSpinButton', src: `${ASSET_BASE}assets/Auto.png` },
+        { alias: 'autoSpinStopButton', src: `${ASSET_BASE}assets/AutoStop.png` },
         { alias: 'valueBar', src: `${ASSET_BASE}assets/ValueBar.png` },
         { alias: 'home', src: `${ASSET_BASE}assets/Home.png` },
         { alias : 'settings', src: `${ASSET_BASE}assets/Settings.png` },
@@ -33,6 +34,13 @@ export async function loadAssets() {
         // -------------- SLOT WIN SPRITES ----------------- //
         { alias: 'lemonWin', src: `${ASSET_BASE}sprites/lemon.json` },
         { alias: 'plumWin', src: `${ASSET_BASE}sprites/plum.json` },
+        { alias: 'wildWin', src: `${ASSET_BASE}sprites/wild.json` },
+        { alias: 'scatterWin', src: `${ASSET_BASE}sprites/scatter.json` },
+        { alias: 'cherryWin', src: `${ASSET_BASE}sprites/cherry.json` },
+        { alias: 'grapesWin', src: `${ASSET_BASE}sprites/grapes.json` },
+        { alias: 'sevenWin', src: `${ASSET_BASE}sprites/seven.json` },
+        { alias: 'watermelonWin', src: `${ASSET_BASE}sprites/watermelon.json` },
+        { alias: 'lemonWin', src: `${ASSET_BASE}sprites/lemon.json` },
 
         // ---------------- BLURRED SLOT ICONS ----------------- //
         { alias: 'watermelonBlur', src: `${ASSET_BASE}assets/watermelonBlur.png` },

@@ -1,14 +1,14 @@
 {"frames": {
 
-"lemon 256 new Comp 100.png":
+"seven 256 Comp 100.png":
 {
-	"frame": {"x":1,"y":1549,"w":208,"h":153},
+	"frame": {"x":1,"y":1549,"w":181,"h":175},
 	"rotated": false,
 	"trimmed": true,
-	"spriteSourceSize": {"x":24,"y":51,"w":208,"h":153},
+	"spriteSourceSize": {"x":37,"y":40,"w":181,"h":175},
 	"sourceSize": {"w":256,"h":256}
 },
-"lemon 256 new Comp 101.png":
+"seven 256 Comp 101.png":
 {
 	"frame": {"x":1,"y":1,"w":256,"h":256},
 	"rotated": false,
@@ -16,15 +16,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
 	"sourceSize": {"w":256,"h":256}
 },
-"lemon 256 new Comp 102.png":
-{
-	"frame": {"x":1,"y":259,"w":256,"h":256},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
-	"sourceSize": {"w":256,"h":256}
-},
-"lemon 256 new Comp 103.png":
+"seven 256 Comp 102.png":
 {
 	"frame": {"x":259,"y":1,"w":256,"h":256},
 	"rotated": false,
@@ -32,7 +24,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
 	"sourceSize": {"w":256,"h":256}
 },
-"lemon 256 new Comp 104.png":
+"seven 256 Comp 103.png":
 {
 	"frame": {"x":517,"y":1,"w":256,"h":256},
 	"rotated": false,
@@ -40,15 +32,15 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
 	"sourceSize": {"w":256,"h":256}
 },
-"lemon 256 new Comp 105.png":
+"seven 256 Comp 104.png":
 {
-	"frame": {"x":1,"y":517,"w":256,"h":256},
+	"frame": {"x":1,"y":259,"w":256,"h":256},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
 	"sourceSize": {"w":256,"h":256}
 },
-"lemon 256 new Comp 106.png":
+"seven 256 Comp 105.png":
 {
 	"frame": {"x":259,"y":259,"w":256,"h":256},
 	"rotated": false,
@@ -56,7 +48,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
 	"sourceSize": {"w":256,"h":256}
 },
-"lemon 256 new Comp 107.png":
+"seven 256 Comp 106.png":
 {
 	"frame": {"x":517,"y":259,"w":256,"h":256},
 	"rotated": false,
@@ -64,15 +56,15 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
 	"sourceSize": {"w":256,"h":256}
 },
-"lemon 256 new Comp 108.png":
+"seven 256 Comp 107.png":
 {
-	"frame": {"x":1,"y":775,"w":256,"h":256},
+	"frame": {"x":1,"y":517,"w":256,"h":256},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
 	"sourceSize": {"w":256,"h":256}
 },
-"lemon 256 new Comp 109.png":
+"seven 256 Comp 108.png":
 {
 	"frame": {"x":259,"y":517,"w":256,"h":256},
 	"rotated": false,
@@ -80,7 +72,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
 	"sourceSize": {"w":256,"h":256}
 },
-"lemon 256 new Comp 110.png":
+"seven 256 Comp 109.png":
 {
 	"frame": {"x":517,"y":517,"w":256,"h":256},
 	"rotated": false,
@@ -88,15 +80,15 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
 	"sourceSize": {"w":256,"h":256}
 },
-"lemon 256 new Comp 111.png":
+"seven 256 Comp 110.png":
 {
-	"frame": {"x":1,"y":1033,"w":256,"h":256},
+	"frame": {"x":1,"y":775,"w":256,"h":256},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
 	"sourceSize": {"w":256,"h":256}
 },
-"lemon 256 new Comp 112.png":
+"seven 256 Comp 111.png":
 {
 	"frame": {"x":259,"y":775,"w":256,"h":256},
 	"rotated": false,
@@ -104,7 +96,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
 	"sourceSize": {"w":256,"h":256}
 },
-"lemon 256 new Comp 113.png":
+"seven 256 Comp 112.png":
 {
 	"frame": {"x":517,"y":775,"w":256,"h":256},
 	"rotated": false,
@@ -112,7 +104,15 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
 	"sourceSize": {"w":256,"h":256}
 },
-"lemon 256 new Comp 114.png":
+"seven 256 Comp 113.png":
+{
+	"frame": {"x":1,"y":1033,"w":256,"h":256},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
+	"sourceSize": {"w":256,"h":256}
+},
+"seven 256 Comp 114.png":
 {
 	"frame": {"x":1,"y":1291,"w":256,"h":256},
 	"rotated": false,
@@ -120,7 +120,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
 	"sourceSize": {"w":256,"h":256}
 },
-"lemon 256 new Comp 115.png":
+"seven 256 Comp 115.png":
 {
 	"frame": {"x":259,"y":1033,"w":256,"h":256},
 	"rotated": false,
@@ -128,15 +128,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
 	"sourceSize": {"w":256,"h":256}
 },
-"lemon 256 new Comp 116.png":
-{
-	"frame": {"x":517,"y":1033,"w":256,"h":256},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
-	"sourceSize": {"w":256,"h":256}
-},
-"lemon 256 new Comp 117.png":
+"seven 256 Comp 116.png":
 {
 	"frame": {"x":259,"y":1291,"w":256,"h":256},
 	"rotated": false,
@@ -144,7 +136,15 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
 	"sourceSize": {"w":256,"h":256}
 },
-"lemon 256 new Comp 118.png":
+"seven 256 Comp 117.png":
+{
+	"frame": {"x":517,"y":1033,"w":256,"h":256},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
+	"sourceSize": {"w":256,"h":256}
+},
+"seven 256 Comp 118.png":
 {
 	"frame": {"x":517,"y":1291,"w":256,"h":256},
 	"rotated": false,
@@ -152,24 +152,24 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
 	"sourceSize": {"w":256,"h":256}
 },
-"lemon 256 new Comp 119.png":
+"seven 256 Comp 119.png":
 {
-	"frame": {"x":211,"y":1549,"w":208,"h":153},
+	"frame": {"x":184,"y":1549,"w":181,"h":175},
 	"rotated": false,
 	"trimmed": true,
-	"spriteSourceSize": {"x":24,"y":51,"w":208,"h":153},
+	"spriteSourceSize": {"x":37,"y":40,"w":181,"h":175},
 	"sourceSize": {"w":256,"h":256}
 }},
 "animations": {
-	"lemon 256 new Comp ": ["lemon 256 new Comp 100.png","lemon 256 new Comp 101.png","lemon 256 new Comp 102.png","lemon 256 new Comp 103.png","lemon 256 new Comp 104.png","lemon 256 new Comp 105.png","lemon 256 new Comp 106.png","lemon 256 new Comp 107.png","lemon 256 new Comp 108.png","lemon 256 new Comp 109.png","lemon 256 new Comp 110.png","lemon 256 new Comp 111.png","lemon 256 new Comp 112.png","lemon 256 new Comp 113.png","lemon 256 new Comp 114.png","lemon 256 new Comp 115.png","lemon 256 new Comp 116.png","lemon 256 new Comp 117.png","lemon 256 new Comp 118.png","lemon 256 new Comp 119.png"]
+	"seven 256 Comp ": ["seven 256 Comp 100.png","seven 256 Comp 101.png","seven 256 Comp 102.png","seven 256 Comp 103.png","seven 256 Comp 104.png","seven 256 Comp 105.png","seven 256 Comp 106.png","seven 256 Comp 107.png","seven 256 Comp 108.png","seven 256 Comp 109.png","seven 256 Comp 110.png","seven 256 Comp 111.png","seven 256 Comp 112.png","seven 256 Comp 113.png","seven 256 Comp 114.png","seven 256 Comp 115.png","seven 256 Comp 116.png","seven 256 Comp 117.png","seven 256 Comp 118.png","seven 256 Comp 119.png"]
 },
 "meta": {
 	"app": "https://www.codeandweb.com/texturepacker",
 	"version": "1.1",
-	"image": "lemon.png",
+	"image": "seven.png",
 	"format": "RGBA8888",
-	"size": {"w":774,"h":1703},
+	"size": {"w":774,"h":1725},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:544a4b82a0b3e9de1a155bcff7fdc04a:bd6f95952a1e8f742ea818d6f132057d:64bcd881aab21cfca582874826352914$"
+	"smartupdate": "$TexturePacker:SmartUpdate:2b9c31f19712607ea47c894501566d1b:5bf1da1e9f223db97494be6b8d8f3d67:5cc42dc2da250d1ffecbc4d511683c2d$"
 }
 }

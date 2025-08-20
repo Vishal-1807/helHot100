@@ -5,13 +5,22 @@ import { getSecureRandomNumber } from '../commons/getRandom';
 import { GlobalState } from '../../globals/gameState';
 import { createSpriteFromLoadedAssets } from '../commons';
 
-export const addSlotIcons = (reelColumn: any, reelColumnContainer: any, columnNumber: number, icons: any[]) => {
+export const addSlotIcons = (reelColumn: any, reelColumnContainer: any, columnNumber: number, icons: any[], useIconsInOrder: boolean = false) => {
     const slotIcons: any[] = [];
 
     const ICON_HEIGHT = reelColumn.height / ICONS_PER_REEL;
 
     for (let i = 0; i < ICONS_PER_REEL; i++) {
-        let icon = icons[Math.floor(getSecureRandomNumber(0, icons.length-1))]
+        let icon: string;
+        if (useIconsInOrder) {
+            // Use the specific icon from the array in order (for final icons after spin)
+            icon = i < icons.length ? icons[i] : icons[Math.floor(getSecureRandomNumber(0, icons.length-1))];
+            console.log(`Column ${columnNumber}, Row ${i}: Using final icon ${icon} in order`);
+        } else {
+            // Use random icon from the array (for initial load)
+            icon = icons[Math.floor(getSecureRandomNumber(0, icons.length-1))];
+            console.log(`Column ${columnNumber}, Row ${i}: Using random icon ${icon}`);
+        }
         const slotIcon = createButton({
             x: reelColumn.x,
             y: reelColumn.y - reelColumn.height/2 + (ICON_HEIGHT/2) + (ICON_HEIGHT * i),

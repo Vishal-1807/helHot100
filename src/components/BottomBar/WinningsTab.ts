@@ -13,6 +13,8 @@ export const createWinningsTab = (appWidth: number, appHeight: number) => {
 
   const balanceTextY = appHeight * 0.046;
 
+  const reward = GlobalState.getReward();
+
   const winningsButton = createButton({
     x: appWidth * UI_POS.WINNINGS_TAB_X,
     y: appHeight * UI_POS.WINNINGS_TAB_Y,
@@ -21,7 +23,7 @@ export const createWinningsTab = (appWidth: number, appHeight: number) => {
     texture: Assets.get('valueBar'),
     borderRadius: 15,
     // fontFamily: 'GameFont',
-    label: '999',
+    label: reward,
     textSize: Math.max(27, appHeight * 0.035),
     textColor: UI_THEME.INPUT_TEXT,
     bold: true,
@@ -31,6 +33,14 @@ export const createWinningsTab = (appWidth: number, appHeight: number) => {
       recordUserActivity(ActivityTypes.BUTTON_CLICK, { buttonName: 'balanceButton' });
     },
   });
+
+  // Function to update the winnings label
+  const updateWinnings = (reward: number) => {
+    (winningsButton as any).setLabel(reward.toFixed(2).toString());
+  };
+
+  // Add reward change listener to listen for reward changes
+  GlobalState.addRewardChangeListener(updateWinnings);
 
   // Resize method
   const resize = (newWidth: number, newHeight: number) => {
@@ -46,6 +56,20 @@ export const createWinningsTab = (appWidth: number, appHeight: number) => {
 
   // Add resize method to container for external access
   (container as any).resize = resize;
+
+  // Expose setDisabled and getDisabled methods for button state manager
+  (container as any).setDisabled = (disabled: boolean) => {
+    if (winningsButton && typeof (winningsButton as any).setDisabled === 'function') {
+      (winningsButton as any).setDisabled(disabled);
+    }
+  };
+
+  (container as any).getDisabled = (): boolean => {
+    if (winningsButton && typeof (winningsButton as any).getDisabled === 'function') {
+      return (winningsButton as any).getDisabled();
+    }
+    return false;
+  };
 
   return container;
 };

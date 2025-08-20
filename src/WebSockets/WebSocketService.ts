@@ -62,7 +62,7 @@ export class WebSocketService {
 
         // Special handling for "info" operation to set bet steps
         if (msg.operation === "info" && msg.mineSweeperAmounts && Array.isArray(msg.mineSweeperAmounts)) {
-          GlobalState.setBetSteps(msg.mineSweeperAmounts);
+          GlobalState.setBetSteps(msg.sta);
           console.log('Bet steps updated', GlobalState.getBetSteps());
         }
 

@@ -9,6 +9,18 @@ export const WIN_POPUP_TYPES = {
     BIG_WIN: 'bigWin',
 }
 
+// -----------------  SLOT ICON MAPPING ----------------- //
+export const slotIconMapping = {
+    'WATERMELON': 'watermelonIcon',
+    'SEVEN': 'sevenIcon',
+    'PLUM': 'plumIcon',
+    'GRAPES': 'grapesIcon',
+    'CHERRY': 'cherryIcon',
+    'LEMON': 'lemonIcon',
+    'SCATTER': 'scatterIcon',
+    'WILD': 'wildIcon'
+}
+
 // -----------------  TEMPORARY SLOT ICONS ----------------- //
-export const tempSlotIconsNames = ['watermelonIcon', 'sevenIcon', 'plumWin', 'grapesIcon', 'cherryIcon', 'lemonIcon', 'scatterIcon', 'wildIcon']
+export const tempSlotIconsNames = ['watermelonIcon', 'sevenIcon', 'plumIcon', 'grapesIcon', 'cherryIcon', 'lemonIcon', 'scatterIcon', 'wildIcon']
 export const blurredSlotIconsNames = ['watermelonBlur', 'sevenBlur', 'plumBlur', 'grapesBlur', 'cherryBlur', 'lemonBlur', 'scatterBlur', 'wildBlur']

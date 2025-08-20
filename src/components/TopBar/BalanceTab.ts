@@ -10,6 +10,8 @@ export const createBalanceTab = (appWidth: number, appHeight: number) => {
   const container = new Container();
   container.zIndex = 50;
 
+  const balance = GlobalState.getBalance().toFixed(2);
+
   const balanceTab = createButton({
     x: appWidth * UI_POS.BALANCE_TAB_X,
     y: appHeight * UI_POS.BALANCE_TAB_Y,
@@ -18,7 +20,7 @@ export const createBalanceTab = (appWidth: number, appHeight: number) => {
     texture: Assets.get('valueBar'),
     // fontFamily: 'GameFont',
     borderRadius: 15,
-    label: '99999',
+    label: balance,
     textSize: Math.max(25, appHeight * 0.035),
     textColor: UI_THEME.INPUT_TEXT,
     bold: true,
@@ -29,10 +31,12 @@ export const createBalanceTab = (appWidth: number, appHeight: number) => {
     },
   });
 
+  // Function to update the balance label
   const updateBalance = (balance: number) => {
     (balanceTab as any).setLabel(balance.toFixed(2).toString());
   };
 
+  // Add balance change listener to listen for balance changes
   GlobalState.addBalanceChangeListener(updateBalance);
 
   const resize = (newWidth: number, newHeight: number) => {
@@ -49,6 +53,20 @@ export const createBalanceTab = (appWidth: number, appHeight: number) => {
 
   // Add resize method to container for external access
   (container as any).resize = resize;
+
+  // Expose setDisabled and getDisabled methods for button state manager
+  (container as any).setDisabled = (disabled: boolean) => {
+    if (balanceTab && typeof (balanceTab as any).setDisabled === 'function') {
+      (balanceTab as any).setDisabled(disabled);
+    }
+  };
+
+  (container as any).getDisabled = (): boolean => {
+    if (balanceTab && typeof (balanceTab as any).getDisabled === 'function') {
+      return (balanceTab as any).getDisabled();
+    }
+    return false;
+  };
 
   return container;
 };

@@ -113,6 +113,20 @@ export const createRulesButton = (appWidth: number, appHeight: number, gameConta
   // Add resize method to container for external access
   (container as any).resize = resize;
 
+  // Expose setDisabled and getDisabled methods for button state manager
+  (container as any).setDisabled = (disabled: boolean) => {
+    if (rulesButton && typeof (rulesButton as any).setDisabled === 'function') {
+      (rulesButton as any).setDisabled(disabled);
+    }
+  };
+
+  (container as any).getDisabled = (): boolean => {
+    if (rulesButton && typeof (rulesButton as any).getDisabled === 'function') {
+      return (rulesButton as any).getDisabled();
+    }
+    return false;
+  };
+
   return container;
 };
 

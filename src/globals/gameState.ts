@@ -1,6 +1,6 @@
 // gameState.ts - Cleaned version with only necessary functions for main.ts
 
-import { disableSettingButtons } from "../utils/gameButtonStateManager";
+// import { disableSettingButtons } from "../utils/gameButtonStateManager";
 import { enableCashoutButton, showGameButtons, hideBetButton } from "../utils/gameButtonVisibilityManager";
 
 // Create listeners arrays outside the exported object to keep them private
@@ -24,7 +24,7 @@ let pendingGameRestoreCompleteListeners: Array<() => void> = [];
 // Layout constants
 const DEFAULT_BALANCE = 1000000;
 const DEFAULT_STAKE = 1.00;
-const DEFAULT_TABLE_ID = "STGMF101";
+const DEFAULT_TABLE_ID = "STGRHR101";
 
 let rulesPage = 1;
 
@@ -213,6 +213,52 @@ const addRewardChangeListener = (callback: (reward: number) => void) => {
     };
 };
 
+const setResultString = (resultString: string) => {
+    GlobalState.resultString = resultString;
+    console.log(`Result string set to: ${resultString}`);
+};
+
+const getResultString = () => {
+    return GlobalState.resultString;
+};
+
+// list of matrices for paylines [[[],[]],[[],[]],[]]
+const setPaylineMatrices = (matrices: number[][][]) => {
+    GlobalState.paylineMatrices = matrices;
+    console.log("Payline matrices set to:", matrices);
+};
+
+const getPaylineMatrices = (): number[][][] => {
+    return GlobalState.paylineMatrices;
+};
+
+const setReelMatrix = (matrix: string[][]) => {
+    GlobalState.reelMatrix = matrix;
+    console.log(`Reel matrix set to:`, matrix);
+};
+
+const getReelMatrix = () => {
+    return GlobalState.reelMatrix;
+};
+
+const getIsAutoSpin = () => {
+    return GlobalState.isAutoSpin;
+}
+
+const setIsAutoSpin = (isAutoSpin: boolean) => {
+    GlobalState.isAutoSpin = isAutoSpin;
+    console.log(`Auto spin set to: ${isAutoSpin}`);
+}
+
+const getIsRoundInProgress = () => {
+    return GlobalState.isRoundInProgress;
+}
+
+const setIsRoundInProgress = (isRoundInProgress: boolean) => {
+    GlobalState.isRoundInProgress = isRoundInProgress;
+    console.log(`Round in progress set to: ${isRoundInProgress}`);
+}
+
 const setStakeAmount = (amount: number) => {
     GlobalState.stakeAmount = amount;
     console.log(`Stake amount set to: ${amount}`);
@@ -293,19 +339,16 @@ const getRoundId = () => {
     return GlobalState.roundId;
 };
 
-const setGameMatrix = (matrix: string[][]) => {
-    GlobalState.game_matrix = matrix;
-    console.log('Game matrix updated:', matrix);
-};
-
-const getGameMatrix = () => {
-    return GlobalState.game_matrix;
-};
-
 const setReward = (newReward: number) => {
     GlobalState.reward = newReward;
     console.log(`Reward set to: ${newReward}`);
     rewardChangeListeners.forEach(listener => listener(newReward));
+}
+
+const triggerRewardListeners = () => {
+    const currentReward = GlobalState.reward;
+    console.log(`🎉 Triggering reward listeners after reels stopped and paylines shown: ${currentReward}`);
+    rewardChangeListeners.forEach(listener => listener(currentReward));
 }
 
 const getReward = () => {
@@ -496,6 +539,7 @@ export const GlobalState = {
     
     // Reward functions
     addRewardChangeListener,
+    triggerRewardListeners,
 
     // Grid functions
     addGridDimensionChangeListener,
@@ -506,10 +550,23 @@ export const GlobalState = {
     getStakeAmount,
     setRoundId,
     getRoundId,
-    setGameMatrix,
-    getGameMatrix,
     setReward,
     getReward,
+    resultString: '',
+    setResultString,
+    getResultString,
+    paylineMatrices: [] as number[][][],
+    setPaylineMatrices,
+    getPaylineMatrices,
+    reelMatrix: [] as string[][],
+    setReelMatrix,
+    getReelMatrix,
+    isAutoSpin: false,
+    setIsAutoSpin,
+    getIsAutoSpin,
+    isRoundInProgress: false,
+    setIsRoundInProgress,
+    getIsRoundInProgress,
     
     // Extensibility placeholders
     addPendingGameRestoreListener,

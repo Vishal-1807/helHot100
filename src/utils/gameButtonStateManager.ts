@@ -1,7 +1,7 @@
 /**
- * Centralized Game Button State Manager
- * Handles enabling/disabling of all game buttons based on game events
- * Prevents users from changing settings during gameplay
+ * Centralized Game Button State Manager for Slot Game
+ * Handles enabling/disabling of all game buttons during spin animations
+ * Prevents users from interacting with buttons while reels are spinning
  */
 
 import { Container } from 'pixi.js';
@@ -9,32 +9,21 @@ import { GlobalState } from '../globals/gameState';
 
 // Interface for all button references that need state management
 interface GameButtonReferences {
-  // Setting buttons that should be disabled during gameplay
-  gridSizeButtons?: {
-    button_3x3?: Container;
-    button_4x4?: Container;
-    button_5x5?: Container;
-  };
+  // Top bar buttons
+  homeButton?: Container;
+  settingsButton?: Container;
+  rulesButton?: Container;
+  balanceTab?: Container;
+
+  // Bottom bar buttons
   betTabButtons?: {
     valueBar?: Container;
     minusButton?: Container;
     plusButton?: Container;
   };
-  minesTabButtons?: {
-    valueBar?: Container;
-    minusButton?: Container;
-    plusButton?: Container;
-  };
-  topBarButtons?: {
-    homeButton?: Container;
-    settingsButton?: Container;
-  };
-  
-  // Action buttons that have different behavior
-  betButton?: Container;
-  cashoutButton?: Container;
-  pickRandomButton?: Container;
-  homeButton?: Container; // If exists
+  spinButton?: Container;
+  autoSpinButton?: Container;
+  winningsTab?: Container;
 }
 
 // Global state
@@ -51,16 +40,16 @@ export const initializeButtonStateManager = (buttons: GameButtonReferences): voi
 
   buttonReferences = { ...buttonReferences, ...buttons };
   isInitialized = true;
-  
+
   console.log('🔘 ButtonStateManager: Initialized with button references:', {
-    gridSizeButtons: !!buttons.gridSizeButtons,
+    homeButton: !!buttons.homeButton,
+    settingsButton: !!buttons.settingsButton,
+    rulesButton: !!buttons.rulesButton,
+    balanceTab: !!buttons.balanceTab,
     betTabButtons: !!buttons.betTabButtons,
-    minesTabButtons: !!buttons.minesTabButtons,
-    betButton: !!buttons.betButton,
-    topBarButtons: !!buttons.topBarButtons,
-    cashoutButton: !!buttons.cashoutButton,
-    pickRandomButton: !!buttons.pickRandomButton,
-    homeButton: !!buttons.homeButton
+    spinButton: !!buttons.spinButton,
+    autoSpinButton: !!buttons.autoSpinButton,
+    winningsTab: !!buttons.winningsTab
   });
 };
 
@@ -92,22 +81,19 @@ const getButtonDisabled = (button: Container | undefined): boolean => {
 };
 
 /**
- * Disable all setting buttons (called when bet button is clicked)
- * Excludes: home, cashout, pickRandom buttons
+ * Disable all buttons during spin animation
+ * Called when spin button is clicked
  */
-export const disableSettingButtons = (): void => {
-  console.log('🔘 ButtonStateManager: Disabling all setting buttons...');
+export const disableButtonsDuringSpin = (): void => {
+  console.log('🔘 ButtonStateManager: Disabling all buttons during spin...');
 
   let disabledCount = 0;
 
-  // Disable grid size buttons
-  if (buttonReferences.gridSizeButtons) {
-    const { button_3x3, button_4x4, button_5x5 } = buttonReferences.gridSizeButtons;
-    setButtonDisabled(button_3x3, true);
-    setButtonDisabled(button_4x4, true);
-    setButtonDisabled(button_5x5, true);
-    disabledCount += 3;
-  }
+  // Disable top bar buttons
+  // setButtonDisabled(buttonReferences.homeButton, true);
+  setButtonDisabled(buttonReferences.settingsButton, true);
+  setButtonDisabled(buttonReferences.rulesButton, true);
+  disabledCount += 3;
 
   // Disable bet tab buttons
   if (buttonReferences.betTabButtons) {
@@ -118,48 +104,27 @@ export const disableSettingButtons = (): void => {
     disabledCount += 3;
   }
 
-  // Disable mines tab buttons
-  if (buttonReferences.minesTabButtons) {
-    const { valueBar, minusButton, plusButton } = buttonReferences.minesTabButtons;
-    setButtonDisabled(valueBar, true);
-    setButtonDisabled(minusButton, true);
-    setButtonDisabled(plusButton, true);
-    disabledCount += 3;
-  }
+  // Disable spin and auto-spin buttons
+  setButtonDisabled(buttonReferences.spinButton, true);
+  if (!GlobalState.getIsAutoSpin()) setButtonDisabled(buttonReferences.autoSpinButton, true);
+  disabledCount += 2;
 
-  // Disable top bar buttons
-  if (buttonReferences.topBarButtons) {
-    const { homeButton, settingsButton } = buttonReferences.topBarButtons;
-    setButtonDisabled(homeButton, true);
-    setButtonDisabled(settingsButton, true);
-    disabledCount += 2;
-  }
-
-  // // Disable bet button
-  // if (buttonReferences.betButton) {
-  //   setButtonDisabled(buttonReferences.betButton, true);
-  //   disabledCount += 1;
-  // }
-
-  console.log(`🔘 ButtonStateManager: ${disabledCount} setting buttons disabled`);
+  console.log(`🔘 ButtonStateManager: ${disabledCount} buttons disabled during spin`);
 };
 
 /**
- * Enable all setting buttons (called when bet fails or game ends)
+ * Enable all buttons after spin animation completes
  */
-export const enableSettingButtons = (): void => {
-  console.log('🔘 ButtonStateManager: Enabling all setting buttons...');
+export const enableButtonsAfterSpin = (): void => {
+  console.log('🔘 ButtonStateManager: Enabling all buttons after spin...');
 
   let enabledCount = 0;
 
-  // Enable grid size buttons
-  if (buttonReferences.gridSizeButtons) {
-    const { button_3x3, button_4x4, button_5x5 } = buttonReferences.gridSizeButtons;
-    setButtonDisabled(button_3x3, false);
-    setButtonDisabled(button_4x4, false);
-    setButtonDisabled(button_5x5, false);
-    enabledCount += 3;
-  }
+  // Enable top bar buttons
+  // setButtonDisabled(buttonReferences.homeButton, false);
+  setButtonDisabled(buttonReferences.settingsButton, false);
+  setButtonDisabled(buttonReferences.rulesButton, false);
+  enabledCount += 3;
 
   // Enable bet tab buttons
   if (buttonReferences.betTabButtons) {
@@ -170,30 +135,12 @@ export const enableSettingButtons = (): void => {
     enabledCount += 3;
   }
 
-  // Enable mines tab buttons
-  if (buttonReferences.minesTabButtons) {
-    const { valueBar, minusButton, plusButton } = buttonReferences.minesTabButtons;
-    setButtonDisabled(valueBar, false);
-    setButtonDisabled(minusButton, false);
-    setButtonDisabled(plusButton, false);
-    enabledCount += 3;
-  }
+  // Enable spin and auto-spin buttons
+  setButtonDisabled(buttonReferences.spinButton, false);
+  setButtonDisabled(buttonReferences.autoSpinButton, false);
+  enabledCount += 2;
 
-  // Enable top bar buttons
-  if (buttonReferences.topBarButtons) {
-    const { homeButton, settingsButton } = buttonReferences.topBarButtons;
-    setButtonDisabled(homeButton, false);
-    setButtonDisabled(settingsButton, false);
-    enabledCount += 2;
-  }
-
-  // // Enable bet button
-  // if (buttonReferences.betButton) {
-  //   setButtonDisabled(buttonReferences.betButton, false);
-  //   enabledCount += 1;
-  // }
-
-  console.log(`🔘 ButtonStateManager: ${enabledCount} setting buttons enabled`);
+  console.log(`🔘 ButtonStateManager: ${enabledCount} buttons enabled after spin`);
 };
 
 /**
@@ -202,13 +149,11 @@ export const enableSettingButtons = (): void => {
 export const getButtonStates = (): Record<string, boolean> => {
   const states: Record<string, boolean> = {};
 
-  // Grid size buttons
-  if (buttonReferences.gridSizeButtons) {
-    const { button_3x3, button_4x4, button_5x5 } = buttonReferences.gridSizeButtons;
-    states['gridSize_3x3'] = getButtonDisabled(button_3x3);
-    states['gridSize_4x4'] = getButtonDisabled(button_4x4);
-    states['gridSize_5x5'] = getButtonDisabled(button_5x5);
-  }
+  // Top bar buttons
+  states['homeButton'] = getButtonDisabled(buttonReferences.homeButton);
+  states['settingsButton'] = getButtonDisabled(buttonReferences.settingsButton);
+  states['rulesButton'] = getButtonDisabled(buttonReferences.rulesButton);
+  states['balanceTab'] = getButtonDisabled(buttonReferences.balanceTab);
 
   // Bet tab buttons
   if (buttonReferences.betTabButtons) {
@@ -218,42 +163,68 @@ export const getButtonStates = (): Record<string, boolean> => {
     states['betTab_plus'] = getButtonDisabled(plusButton);
   }
 
-  // Mines tab buttons
-  if (buttonReferences.minesTabButtons) {
-    const { valueBar, minusButton, plusButton } = buttonReferences.minesTabButtons;
-    states['minesTab_valueBar'] = getButtonDisabled(valueBar);
-    states['minesTab_minus'] = getButtonDisabled(minusButton);
-    states['minesTab_plus'] = getButtonDisabled(plusButton);
-  }
-
-  // Top bar buttons
-  if (buttonReferences.topBarButtons) {
-    const { homeButton, settingsButton } = buttonReferences.topBarButtons;
-    states['topBar_home'] = getButtonDisabled(homeButton);
-    states['topBar_settings'] = getButtonDisabled(settingsButton);
-  }
-
-  // Bet button
-  if (buttonReferences.betButton) {
-    states['betButton'] = getButtonDisabled(buttonReferences.betButton);
-  }
+  // Bottom bar buttons
+  states['spinButton'] = getButtonDisabled(buttonReferences.spinButton);
+  states['autoSpinButton'] = getButtonDisabled(buttonReferences.autoSpinButton);
+  states['winningsTab'] = getButtonDisabled(buttonReferences.winningsTab);
 
   return states;
+};
+
+/**
+ * Handle autospin state changes
+ * Call this when autospin is stopped to re-enable all buttons
+ */
+export const handleAutoSpinStopped = (): void => {
+  console.log('🔘 ButtonStateManager: Autospin stopped - enabling all buttons');
+  enableButtonsAfterSpin();
+  logButtonStates();
 };
 
 /**
  * Setup automatic listeners for game state changes
  */
 export const setupGameStateListeners = (): void => {
-  // Listen for game end to re-enable setting buttons
+  // Listen for game end to re-enable buttons
   GlobalState.addGameEndedListener(() => {
-    console.log('🔘 ButtonStateManager: Game ended - enabling setting buttons');
+    console.log('🔘 ButtonStateManager: Game ended - enabling buttons');
     logButtonStates(); // Log states before enabling
-    enableSettingButtons();
+    enableButtonsAfterSpin();
     logButtonStates(); // Log states after enabling
   });
 
   console.log('🔘 ButtonStateManager: Game state listeners registered');
+};
+
+/**
+ * Start spin - disable all buttons during spin animation
+ * Call this when the spin button is clicked
+ */
+export const startSpin = (): void => {
+  console.log('🔘 ButtonStateManager: Starting spin - disabling buttons');
+  disableButtonsDuringSpin();
+  logButtonStates();
+};
+
+/**
+ * End spin - enable all buttons after spin animation completes
+ * Call this when the spin animation finishes (after all reels stop)
+ * Note: Buttons remain disabled if autospin is active
+ */
+export const endSpin = (): void => {
+  const isAutoSpinActive = GlobalState.getIsAutoSpin();
+
+  if (isAutoSpinActive) {
+    console.log('🔘 ButtonStateManager: Ending spin - keeping buttons disabled (autospin active)');
+    // Keep buttons disabled during autospin, but allow autospin button to remain functional
+    // Only enable the autospin button so users can stop autospin
+    setButtonDisabled(buttonReferences.autoSpinButton, false);
+  } else {
+    console.log('🔘 ButtonStateManager: Ending spin - enabling buttons (autospin inactive)');
+    enableButtonsAfterSpin();
+  }
+
+  logButtonStates();
 };
 
 /**
