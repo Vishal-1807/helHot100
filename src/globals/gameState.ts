@@ -250,6 +250,15 @@ const setIsAutoSpin = (isAutoSpin: boolean) => {
     console.log(`Auto spin set to: ${isAutoSpin}`);
 }
 
+const setWinCombo = (winCombo: string) => {
+    GlobalState.winCombo = winCombo;
+    console.log(`Win combo set to: ${winCombo}`);
+}
+
+const getWinCombo = () => {
+    return GlobalState.winCombo;
+}
+
 const getIsRoundInProgress = () => {
     return GlobalState.isRoundInProgress;
 }
@@ -567,6 +576,9 @@ export const GlobalState = {
     isRoundInProgress: false,
     setIsRoundInProgress,
     getIsRoundInProgress,
+    winCombo: '',
+    setWinCombo,
+    getWinCombo,
     
     // Extensibility placeholders
     addPendingGameRestoreListener,

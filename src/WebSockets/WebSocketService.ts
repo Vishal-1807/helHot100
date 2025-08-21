@@ -15,7 +15,10 @@ export class WebSocketService {
   // Get the URL with the current token from GlobalState
   private getWebSocketUrl(): string {
     const token = REACT_MODE ? GlobalState.getToken() : gametoken;
-    return REACT_MODE ? `${GlobalState.getWebSocketUrl()}/user/auth?authorization=Bearer ${token}` : `wss://backend.inferixai.link/user/auth?authorization=Bearer ${token}`;
+    return REACT_MODE ? `${GlobalState.getWebSocketUrl()}/user/auth?authorization=Bearer ${token}` : `ws://10.21.12.166:8080/user/PFT_yN8WDPzb?authorization=Bearer ${token}`;
+    // `wss://backend.inferixai.link/user/auth?authorization=Bearer ${token}`;
+    // `ws://10.21.12.166:8080/user/PFT_yN8WDPzb?authorization=Bearer ${token}`;
+
   }
 
   private constructor() {

@@ -16,8 +16,19 @@ export const createAutoSpinButton = (appWidth: number, appHeight: number, gameCo
 
   // Function to handle auto-spin loop
   const handleAutoSpinLoop = async () => {
+    recordUserActivity(ActivityTypes.BUTTON_CLICK, { buttonName: 'autoSpinButton' });
     if (!GlobalState.getIsAutoSpin()) {
       return; // Auto-spin was stopped
+    }
+
+    // Check if a round is already in progress - if so, wait for it to complete
+    if (GlobalState.getIsRoundInProgress()) {
+      console.log('🔄 Auto-spin waiting for current round to complete...');
+      // Schedule a retry after a short delay
+      autoSpinTimeoutId = setTimeout(() => {
+        handleAutoSpinLoop();
+      }, 100); // Check again in 100ms
+      return;
     }
 
     // Safety checks before spinning
@@ -80,9 +91,6 @@ export const createAutoSpinButton = (appWidth: number, appHeight: number, gameCo
     onClick: async () => {
       const currentAutoSpinState = GlobalState.getIsAutoSpin();
 
-      // Toggle auto-spin state
-      GlobalState.setIsAutoSpin(!currentAutoSpinState);
-
       if (!currentAutoSpinState) {
         // Starting auto-spin
         console.log('🔄 Auto spin started');
@@ -90,14 +98,44 @@ export const createAutoSpinButton = (appWidth: number, appHeight: number, gameCo
         console.log('🔧 DEBUG: gameContainer.gameArea:', gameContainer?.gameArea ? 'exists' : 'undefined');
         console.log('🔧 DEBUG: reelContainer:', reelContainer ? 'exists' : 'undefined');
 
+        // Clear any existing timeout first
+        if (autoSpinTimeoutId) {
+          clearTimeout(autoSpinTimeoutId);
+          autoSpinTimeoutId = null;
+        }
+
+        // Set auto-spin state
+        GlobalState.setIsAutoSpin(true);
+
         // Switch to stop button texture
         if (autoSpinButton && typeof (autoSpinButton as any).setTexture === 'function') {
           (autoSpinButton as any).setTexture(Assets.get('autoSpinStopButton'));
         }
+
+        // Check if a round is currently in progress
+        const isRoundInProgress = GlobalState.getIsRoundInProgress();
+        if (isRoundInProgress) {
+          console.log('🔄 Auto spin enabled mid-round - will start autoplay after current round completes');
+          // The autoplay loop will start after the current round finishes
+          // handleAutoSpinLoop will check for round completion before starting
+        } else {
+          console.log('🔄 Starting autoplay loop immediately');
+        }
+
+        // Start the autoplay loop (it will handle waiting for current round if needed)
         handleAutoSpinLoop();
       } else {
         // Stopping auto-spin
         const isRoundInProgress = GlobalState.getIsRoundInProgress();
+
+        // Set auto-spin state to false first
+        GlobalState.setIsAutoSpin(false);
+
+        // Always clear the timeout to prevent scheduling new rounds
+        if (autoSpinTimeoutId) {
+          clearTimeout(autoSpinTimeoutId);
+          autoSpinTimeoutId = null;
+        }
 
         if (isRoundInProgress) {
           console.log('🔄 Auto spin stop requested - will finish current round');
@@ -111,12 +149,6 @@ export const createAutoSpinButton = (appWidth: number, appHeight: number, gameCo
           }
           // Re-enable all buttons when autospin is stopped
           handleAutoSpinStopped();
-        }
-
-        // Always clear the timeout to prevent scheduling new rounds
-        if (autoSpinTimeoutId) {
-          clearTimeout(autoSpinTimeoutId);
-          autoSpinTimeoutId = null;
         }
       }
 

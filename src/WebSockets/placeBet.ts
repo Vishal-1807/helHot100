@@ -17,6 +17,7 @@ export const sendPlaceBetEvent = async () => {
         GlobalState.setBalance(res.balance);
         GlobalState.setResultString(res.winCombo);
         GlobalState.setReelMatrix(res.matrix);
+        GlobalState.setWinCombo(res.winCombo);
 
         console.log('✅ Bet placed successfully - game started', res);
 
@@ -30,12 +31,6 @@ export const sendPlaceBetEvent = async () => {
           reject(new Error(error));
         }
 
-        // // Enable grid and pick random button
-        // enableGrid();
-        // enablePickRandomButton();
-
-        // Show cashout and pick random buttons after successful bet
-        // showGameButtons();
         resolve(res);
       } else {
         console.error('❌ Failed to place bet:', res);

@@ -3,12 +3,13 @@ import { GlobalState } from './globals/gameState';
 import { REACT_MODE } from "./components/constants/ReactMode";
 
 export async function loadAssets() {
-    const ASSET_BASE = '';
-    // const ASSET_BASE = REACT_MODE ? `${GlobalState.getS3Url()}mines-field/` : 'https://s3.eu-west-2.amazonaws.com/static.inferixai.link/pixi-game-assets/mines-field/'
+    // const ASSET_BASE = '';
+    const ASSET_BASE = REACT_MODE ? `${GlobalState.getS3Url()}mines-field/` : 'https://s3.eu-west-2.amazonaws.com/static.inferixai.link/pixi-game-assets/red-heat-reels/'
     
     // Load all assets including the font file
     await Assets.load([
         { alias: 'spinButton', src: `${ASSET_BASE}assets/SpinButton.png` },
+        { alias: 'stopButton', src: `${ASSET_BASE}assets/StopButton.png` },
         { alias: 'autoSpinButton', src: `${ASSET_BASE}assets/Auto.png` },
         { alias: 'autoSpinStopButton', src: `${ASSET_BASE}assets/AutoStop.png` },
         { alias: 'valueBar', src: `${ASSET_BASE}assets/ValueBar.png` },
@@ -53,8 +54,8 @@ export async function loadAssets() {
         { alias: 'wildBlur', src: `${ASSET_BASE}assets/wildBlur.png` },
 
         // ------------- WIN POPUP ----------------- //
-        { alias: 'totalWin', src: `${ASSET_BASE}assets/TotalWin.png` },
-        { alias: 'bigWin', src: `${ASSET_BASE}assets/BigWin.png` },
+        // { alias: 'totalWin', src: `${ASSET_BASE}assets/TotalWin.png` },
+        { alias: 'bigWin', src: `${ASSET_BASE}sprites/bigwin2.json` },
 
         // ----------------- COMMON POPUP ----------------- //
         { alias: 'commonPopup', src: `${ASSET_BASE}assets/CommonPopup.png` },

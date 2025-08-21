@@ -331,6 +331,7 @@ Configuration options for customizing the win popup appearance and behavior.
 | textRelativeY | Number | 0.5 | Relative Y position for text (0 to 1, where 0.5 is center) |
 | textStyle | Partial<TextStyle> | Default style | PixiJS TextStyle configuration for text appearance |
 | texture | PIXI.Sprite \| PIXI.Texture | undefined | Custom sprite or texture for popup background |
+| isAutoSpin | Boolean | false | Whether this popup is part of an auto spin sequence (affects duration) |
 
 ### TextStyle Properties
 
@@ -503,24 +504,33 @@ ShowWinPopup(appWidth, appHeight, container, 'bigWin', {
 });
 ```
 
-### Custom Animation Timing
+### Auto Spin vs Manual Spin Timing
 
-While the component uses fixed 3-second timing, you can create variations:
+The component automatically adjusts timing based on whether it's part of an auto spin sequence:
 
 ```typescript
-// Quick popup for small wins
-const showQuickWin = async (appWidth: number, appHeight: number, 
-                           container: PIXI.Container, amount: number) => {
-  // Show popup but don't wait for full duration
-  const popupPromise = ShowWinPopup(appWidth, appHeight, container, 'totalWin', {
-    winAmount: amount,
-    textStyle: { fontSize: 20, fill: 0x00FF00 }
+// Manual spin - shows for 3 seconds
+await ShowWinPopup(appWidth, appHeight, container, 'bigWin', {
+  winAmount: 1500,
+  isAutoSpin: false // Default value
+});
+
+// Auto spin - shows for 1.5 seconds (faster for better flow)
+await ShowWinPopup(appWidth, appHeight, container, 'bigWin', {
+  winAmount: 1500,
+  isAutoSpin: true
+});
+
+// Example usage in game logic
+const handleWin = async (winAmount: number, isAutoSpinActive: boolean) => {
+  await ShowWinPopup(appWidth, appHeight, container, 'bigWin', {
+    winAmount: winAmount,
+    isAutoSpin: isAutoSpinActive,
+    textStyle: { fontSize: 32, fill: 0xFFD700 }
   });
-  
-  // Continue after 1.5 seconds instead of waiting for full 3.8 seconds
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  return popupPromise; // Still return original promise for cleanup
+
+  // Continue game flow after popup completes
+  enableGameControls();
 };
 ```
 

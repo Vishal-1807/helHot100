@@ -1,0 +1,175 @@
+{"frames": {
+
+"big win hell hot00.png":
+{
+	"frame": {"x":0,"y":0,"w":560,"h":560},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":560,"h":560},
+	"sourceSize": {"w":560,"h":560}
+},
+"big win hell hot01.png":
+{
+	"frame": {"x":560,"y":0,"w":560,"h":560},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":560,"h":560},
+	"sourceSize": {"w":560,"h":560}
+},
+"big win hell hot02.png":
+{
+	"frame": {"x":1120,"y":0,"w":560,"h":560},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":560,"h":560},
+	"sourceSize": {"w":560,"h":560}
+},
+"big win hell hot03.png":
+{
+	"frame": {"x":0,"y":560,"w":560,"h":560},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":560,"h":560},
+	"sourceSize": {"w":560,"h":560}
+},
+"big win hell hot04.png":
+{
+	"frame": {"x":560,"y":560,"w":560,"h":560},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":560,"h":560},
+	"sourceSize": {"w":560,"h":560}
+},
+"big win hell hot05.png":
+{
+	"frame": {"x":1120,"y":560,"w":560,"h":560},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":560,"h":560},
+	"sourceSize": {"w":560,"h":560}
+},
+"big win hell hot06.png":
+{
+	"frame": {"x":0,"y":1120,"w":560,"h":560},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":560,"h":560},
+	"sourceSize": {"w":560,"h":560}
+},
+"big win hell hot07.png":
+{
+	"frame": {"x":560,"y":1120,"w":560,"h":560},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":560,"h":560},
+	"sourceSize": {"w":560,"h":560}
+},
+"big win hell hot08.png":
+{
+	"frame": {"x":1120,"y":1120,"w":560,"h":560},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":560,"h":560},
+	"sourceSize": {"w":560,"h":560}
+},
+"big win hell hot09.png":
+{
+	"frame": {"x":0,"y":1680,"w":560,"h":560},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":560,"h":560},
+	"sourceSize": {"w":560,"h":560}
+},
+"big win hell hot10.png":
+{
+	"frame": {"x":560,"y":1680,"w":560,"h":560},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":560,"h":560},
+	"sourceSize": {"w":560,"h":560}
+},
+"big win hell hot11.png":
+{
+	"frame": {"x":1120,"y":1680,"w":560,"h":560},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":560,"h":560},
+	"sourceSize": {"w":560,"h":560}
+},
+"big win hell hot12.png":
+{
+	"frame": {"x":0,"y":2240,"w":560,"h":560},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":560,"h":560},
+	"sourceSize": {"w":560,"h":560}
+},
+"big win hell hot13.png":
+{
+	"frame": {"x":0,"y":2800,"w":560,"h":560},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":560,"h":560},
+	"sourceSize": {"w":560,"h":560}
+},
+"big win hell hot14.png":
+{
+	"frame": {"x":0,"y":3360,"w":560,"h":560},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":560,"h":560},
+	"sourceSize": {"w":560,"h":560}
+},
+"big win hell hot15.png":
+{
+	"frame": {"x":560,"y":2240,"w":560,"h":560},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":560,"h":560},
+	"sourceSize": {"w":560,"h":560}
+},
+"big win hell hot16.png":
+{
+	"frame": {"x":1120,"y":2240,"w":560,"h":560},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":560,"h":560},
+	"sourceSize": {"w":560,"h":560}
+},
+"big win hell hot17.png":
+{
+	"frame": {"x":560,"y":2800,"w":560,"h":560},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":560,"h":560},
+	"sourceSize": {"w":560,"h":560}
+},
+"big win hell hot18.png":
+{
+	"frame": {"x":560,"y":3360,"w":560,"h":560},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":560,"h":560},
+	"sourceSize": {"w":560,"h":560}
+},
+"big win hell hot19.png":
+{
+	"frame": {"x":1120,"y":2800,"w":560,"h":560},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":560,"h":560},
+	"sourceSize": {"w":560,"h":560}
+}},
+"animations": {
+	"big win hell hot": ["big win hell hot00.png","big win hell hot01.png","big win hell hot02.png","big win hell hot03.png","big win hell hot04.png","big win hell hot05.png","big win hell hot06.png","big win hell hot07.png","big win hell hot08.png","big win hell hot09.png","big win hell hot10.png","big win hell hot11.png","big win hell hot12.png","big win hell hot13.png","big win hell hot14.png","big win hell hot15.png","big win hell hot16.png","big win hell hot17.png","big win hell hot18.png","big win hell hot19.png"]
+},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.1",
+	"image": "bigwin2.png",
+	"format": "RGBA8888",
+	"size": {"w":1680,"h":3920},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:c9db33cf21b6cdd2468b59fa38f3c6be:74c3ac0ba17f83c62a7d6b87c4670768:ad473ad581b09a2eb5916a62b0b740f4$"
+}
+}
