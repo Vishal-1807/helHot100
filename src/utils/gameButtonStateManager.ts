@@ -23,6 +23,7 @@ interface GameButtonReferences {
   };
   spinButton?: Container;
   autoSpinButton?: Container;
+  turboButton?: Container;
   winningsTab?: Container;
 }
 
@@ -49,6 +50,7 @@ export const initializeButtonStateManager = (buttons: GameButtonReferences): voi
     betTabButtons: !!buttons.betTabButtons,
     spinButton: !!buttons.spinButton,
     autoSpinButton: !!buttons.autoSpinButton,
+    turboButton: !!buttons.turboButton,
     winningsTab: !!buttons.winningsTab
   });
 };
@@ -67,6 +69,15 @@ export const addButtonReferences = (buttons: Partial<GameButtonReferences>): voi
 const setButtonDisabled = (button: Container | undefined, disabled: boolean): void => {
   if (button && typeof (button as any).setDisabled === 'function') {
     (button as any).setDisabled(disabled);
+  }
+};
+
+/**
+ * Helper function to safely set button texture
+ */
+const setButtonTexture = (button: Container | undefined, texture: any): void => {
+  if (button && typeof (button as any).setTexture === 'function') {
+    (button as any).setTexture(texture);
   }
 };
 
@@ -107,6 +118,8 @@ export const disableButtonsDuringSpin = (): void => {
   // Disable spin and auto-spin buttons
   setButtonDisabled(buttonReferences.spinButton, true);
   if (!GlobalState.getIsAutoSpin()) setButtonDisabled(buttonReferences.autoSpinButton, true);
+  // Keep turbo button enabled during spins so users can toggle turbo mode
+  // setButtonDisabled(buttonReferences.turboButton, true);
   disabledCount += 2;
 
   console.log(`🔘 ButtonStateManager: ${disabledCount} buttons disabled during spin`);
@@ -138,7 +151,9 @@ export const enableButtonsAfterSpin = (): void => {
   // Enable spin and auto-spin buttons
   setButtonDisabled(buttonReferences.spinButton, false);
   setButtonDisabled(buttonReferences.autoSpinButton, false);
-  enabledCount += 2;
+  // Turbo button should always remain enabled
+  setButtonDisabled(buttonReferences.turboButton, false);
+  enabledCount += 3;
 
   console.log(`🔘 ButtonStateManager: ${enabledCount} buttons enabled after spin`);
 };
@@ -166,6 +181,7 @@ export const getButtonStates = (): Record<string, boolean> => {
   // Bottom bar buttons
   states['spinButton'] = getButtonDisabled(buttonReferences.spinButton);
   states['autoSpinButton'] = getButtonDisabled(buttonReferences.autoSpinButton);
+  states['turboButton'] = getButtonDisabled(buttonReferences.turboButton);
   states['winningsTab'] = getButtonDisabled(buttonReferences.winningsTab);
 
   return states;
@@ -225,6 +241,57 @@ export const endSpin = (): void => {
   }
 
   logButtonStates();
+};
+
+/**
+ * Switch spin button to stop button texture and keep it disabled
+ * Call this when spin button is clicked and server request is sent
+ */
+export const switchSpinToStop = (): void => {
+  console.log('🔘 ButtonStateManager: Switching spin button to stop button');
+  const { spinButton } = buttonReferences;
+
+  if (spinButton && typeof (spinButton as any).switchToStop === 'function') {
+    (spinButton as any).switchToStop();
+  }
+
+  // Keep the button disabled until server response
+  setButtonDisabled(spinButton, true);
+};
+
+/**
+ * Enable stop button after successful server response
+ * Call this when server responds successfully to allow stopping
+ */
+export const enableStopButton = (): void => {
+  console.log('🔘 ButtonStateManager: Enabling stop button');
+  const { spinButton } = buttonReferences;
+  setButtonDisabled(spinButton, false);
+};
+
+/**
+ * Switch stop button back to spin button and disable it
+ * Call this when stop button is clicked or animations complete
+ */
+export const switchStopToSpin = (): void => {
+  console.log('🔘 ButtonStateManager: Switching stop button back to spin button');
+  const { spinButton } = buttonReferences;
+
+  if (spinButton && typeof (spinButton as any).switchToSpin === 'function') {
+    (spinButton as any).switchToSpin();
+  }
+
+  // Keep disabled until animations complete
+  setButtonDisabled(spinButton, true);
+};
+
+/**
+ * Set spin button disabled state specifically
+ * Helper function for external control
+ */
+export const setSpinButtonDisabled = (disabled: boolean): void => {
+  console.log(`🔘 ButtonStateManager: Setting spin button disabled: ${disabled}`);
+  setButtonDisabled(buttonReferences.spinButton, disabled);
 };
 
 /**

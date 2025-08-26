@@ -11,7 +11,7 @@ import { SoundManager } from './utils/SoundManager';
 import { createGameContainer } from './components/gameContainer';
 import {UI_THEME} from './components/constants/UIThemeColors';
 import { createBetTab, createWinningsTab, createSpinButton, createBalanceTab, 
-  createAutoSpinButton, createHomeButton, createSettingsButton, createRulesButton, createReelContainer } from './components/';
+  createAutoSpinButton, createHomeButton, createSettingsButton, createRulesButton, createReelContainer, createTurboButton } from './components/';
 import {
   createSimplePositionedContainer,
 } from './components/commons/PositionedContainer';
@@ -115,7 +115,7 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
   let reelContainer: any;
 
   //bottom bar
-  let betTab: any, winningsTab: any, spinButton: any, autoSpinButton: any;
+  let betTab: any, winningsTab: any, spinButton: any, autoSpinButton: any, turboButton: any;
 
   const initializeGameUI = (): void => {
     console.log('🎮 STEP 3: Initializing game UI...');
@@ -241,11 +241,13 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
     winningsTab = createWinningsTab(bottomBarRef.container.width, bottomBarRef.container.height);
     spinButton = createSpinButton(bottomBarRef.container.width, bottomBarRef.container.height, gameContainer, reelContainer);
     autoSpinButton = createAutoSpinButton(bottomBarRef.container.width, bottomBarRef.container.height, gameContainer, reelContainer);
+    turboButton = createTurboButton(bottomBarRef.container.width, bottomBarRef.container.height);
 
     bottomBarRef.container.addChild(betTab);
     bottomBarRef.container.addChild(winningsTab);
     bottomBarRef.container.addChild(spinButton);
     bottomBarRef.container.addChild(autoSpinButton);
+    bottomBarRef.container.addChild(turboButton);
 
     gameBoardRef.container.sortableChildren = true;
 
@@ -257,6 +259,7 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
       balanceTab: balanceTab,
       spinButton: spinButton,
       autoSpinButton: autoSpinButton,
+      turboButton: turboButton,
       winningsTab: winningsTab
     });
 
@@ -439,6 +442,9 @@ const initializeGame = async (app: Application, container?: HTMLDivElement) => {
       }
       if (autoSpinButton && typeof (autoSpinButton as any).resize === 'function') {
         (autoSpinButton as any).resize(bottomBarBounds.width, bottomBarBounds.height);
+      }
+      if (turboButton && typeof (turboButton as any).resize === 'function') {
+        (turboButton as any).resize(bottomBarBounds.width, bottomBarBounds.height);
       }
 
 

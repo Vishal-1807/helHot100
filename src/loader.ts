@@ -4,7 +4,7 @@ import { REACT_MODE } from "./components/constants/ReactMode";
 
 export async function loadAssets() {
     // const ASSET_BASE = '';
-    const ASSET_BASE = REACT_MODE ? `${GlobalState.getS3Url()}mines-field/` : 'https://s3.eu-west-2.amazonaws.com/static.inferixai.link/pixi-game-assets/red-heat-reels/'
+    const ASSET_BASE = REACT_MODE ? `${GlobalState.getS3Url()}red-heat-reels/` : 'https://s3.eu-west-2.amazonaws.com/static.inferixai.link/pixi-game-assets/red-heat-reels/'
     
     // Load all assets including the font file
     await Assets.load([
@@ -12,6 +12,8 @@ export async function loadAssets() {
         { alias: 'stopButton', src: `${ASSET_BASE}assets/StopButton.png` },
         { alias: 'autoSpinButton', src: `${ASSET_BASE}assets/Auto.png` },
         { alias: 'autoSpinStopButton', src: `${ASSET_BASE}assets/AutoStop.png` },
+        { alias: 'turbo', src: `${ASSET_BASE}assets/turbo.png` },
+        { alias: 'turboActive', src: `${ASSET_BASE}sprites/turbo.json` },
         { alias: 'valueBar', src: `${ASSET_BASE}assets/ValueBar.png` },
         { alias: 'home', src: `${ASSET_BASE}assets/Home.png` },
         { alias : 'settings', src: `${ASSET_BASE}assets/Settings.png` },
@@ -73,6 +75,7 @@ export async function loadAssets() {
         { alias: 'PaylinePage2', src: `${ASSET_BASE}assets/PaylinePage2.png` },
         { alias: 'PaylinePage3', src: `${ASSET_BASE}assets/PaylinePage3.png` },
         { alias: 'PaylinePage4', src: `${ASSET_BASE}assets/PaylinePage4.png` },
+        { alias: 'PaylinePage5', src: `${ASSET_BASE}assets/PaylinePage5.png` },
     ]);
 
     console.log('All assets loaded successfully');

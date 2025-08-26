@@ -268,6 +268,15 @@ const setIsRoundInProgress = (isRoundInProgress: boolean) => {
     console.log(`Round in progress set to: ${isRoundInProgress}`);
 }
 
+const getIsTurboMode = () => {
+    return GlobalState.isTurboMode;
+}
+
+const setIsTurboMode = (isTurboMode: boolean) => {
+    GlobalState.isTurboMode = isTurboMode;
+    console.log(`Turbo mode set to: ${isTurboMode}`);
+}
+
 const setStakeAmount = (amount: number) => {
     GlobalState.stakeAmount = amount;
     console.log(`Stake amount set to: ${amount}`);
@@ -358,6 +367,18 @@ const triggerRewardListeners = () => {
     const currentReward = GlobalState.reward;
     console.log(`🎉 Triggering reward listeners after reels stopped and paylines shown: ${currentReward}`);
     rewardChangeListeners.forEach(listener => listener(currentReward));
+}
+
+const triggerBalanceListeners = () => {
+    const currentBalance = GlobalState.balance;
+    console.log(`💳 Triggering balance listeners after reels stopped and paylines shown: ${currentBalance}`);
+    balanceChangeListeners.forEach(listener => {
+        try {
+            listener(currentBalance);
+        } catch (error) {
+            console.error('💳 Error in balance change listener:', error);
+        }
+    });
 }
 
 const getReward = () => {
@@ -545,7 +566,8 @@ export const GlobalState = {
     setBalance,
     getBalance,
     addBalanceChangeListener,
-    
+    triggerBalanceListeners,
+
     // Reward functions
     addRewardChangeListener,
     triggerRewardListeners,
@@ -576,6 +598,9 @@ export const GlobalState = {
     isRoundInProgress: false,
     setIsRoundInProgress,
     getIsRoundInProgress,
+    isTurboMode: false,
+    setIsTurboMode,
+    getIsTurboMode,
     winCombo: '',
     setWinCombo,
     getWinCombo,

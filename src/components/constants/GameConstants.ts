@@ -1,7 +1,7 @@
 // --------------- GAME CONSTANTS --------------- //
 export const TOTAL_REELS = 5;
 export const ICONS_PER_REEL = 4;
-export const TOTAL_RULE_PAGES = 4;
+export const TOTAL_RULE_PAGES = 5;
 
 // ----------------- WIN POPUP TYPES ----------------- //
 export const WIN_POPUP_TYPES = {

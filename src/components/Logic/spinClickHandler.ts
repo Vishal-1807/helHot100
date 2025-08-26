@@ -1,4 +1,4 @@
-import { startSpin, endSpin } from "../../utils/gameButtonStateManager";
+import { startSpin, endSpin, switchSpinToStop, enableStopButton, switchStopToSpin } from "../../utils/gameButtonStateManager";
 import { stopReelAnimation, stopReelAnimationSequential } from "./reelAnimation";
 import { animateReelSpin } from "./reelAnimation";
 import { sendRoundStartEvent } from "../../WebSockets/roundStart";
@@ -8,6 +8,34 @@ import { createMultiplePayline, clearPaylines } from "../commons/createPayline";
 import { createSpriteFromLoadedAssets } from "../commons/Sprites";
 import { createButton } from "../commons/Button";
 import { ShowWinPopup } from "../popups/WinPopup";
+
+// Global variables to track active spin timeouts for cancellation
+let activeSpinTimeouts: number[] = [];
+let isSpinCancelled = false;
+
+/**
+ * Cancel all active spin timeouts and mark spin as cancelled
+ */
+export const cancelActiveSpin = (): void => {
+  console.log('🛑 Cancelling active spin timeouts');
+  isSpinCancelled = true;
+
+  // Clear all active timeouts
+  activeSpinTimeouts.forEach(timeoutId => {
+    clearTimeout(timeoutId);
+  });
+  activeSpinTimeouts = [];
+
+  console.log('🛑 All spin timeouts cancelled');
+};
+
+/**
+ * Reset spin cancellation state for new spins
+ */
+const resetSpinCancellation = (): void => {
+  isSpinCancelled = false;
+  activeSpinTimeouts = [];
+};
 
 
 
@@ -286,19 +314,14 @@ const convertWinningPositionsToSprites = (reelContainer: any, paylineMatrices: n
   });
 };
 
-export const spinClickHandler = async (reelContainer: any, gameContainer: any, isAutoSpin: boolean = false): Promise<void> => {
-  // Mark that a round is in progress
-  GlobalState.setIsRoundInProgress(true);
+/**
+ * Show final results including paylines and big wins
+ * This function is extracted to be reusable by both normal spin completion and stop button
+ */
+const showFinalResults = async (reelContainer: any, gameContainer: any, isAutoSpin: boolean = false): Promise<void> => {
+  console.log('🎯 Showing final results - paylines and big wins');
 
-  // Disable autoSpin when manual spin is started (but not when started by auto button)
-  if (!isAutoSpin && GlobalState.getIsAutoSpin()) {
-    console.log('🔄 Manual spin detected - disabling autoSpin');
-    GlobalState.setIsAutoSpin(false);
-  }
-
-  return new Promise(async (resolve, reject) => {
-    try {
-      const paylineOptions = {
+  const paylineOptions = {
     color: 0x800080, // purple
     width: 3,
     alpha: 1,
@@ -310,16 +333,212 @@ export const spinClickHandler = async (reelContainer: any, gameContainer: any, i
     pulseMinAlpha: 0.3,
     pulseMaxAlpha: 1.0,
     extensionLength: reelContainer.width * 0.05,
-    // offset: 0 // Manual offset: no offset for first payline
-  }
+  };
 
   const colors = [0xFF4444, 0x44FF44, 0x4444FF, 0xFF44FF, 0xFFFF00, 0xFF00FF];
+  let multiplePaylinesParams: any[] = [];
 
-  console.log('Spin button clicked - starting reel animation');
-  // Disable all buttons during spin
-  console.log('🔧 DEBUG: About to call startSpin()');
-  startSpin();
-  console.log('🔧 DEBUG: startSpin() called');
+  // Get existing payline matrices and WinCombo
+  const existingPaylineMatrices = GlobalState.getPaylineMatrices() || [];
+  const winCombo = GlobalState.getWinCombo();
+
+  console.log('📊 Existing payline matrices:', existingPaylineMatrices);
+  console.log('🎯 WinCombo from server:', winCombo);
+
+  let processedPaylineMatrices: number[][][] = []; // For sprite conversion (with count logic)
+  let paylinesToShow: number[][][] = []; // For payline display (entire lines)
+
+  if (winCombo && winCombo.trim() !== '') {
+    // Parse WinCombo to get processed matrices (for sprite conversion with count logic)
+    processedPaylineMatrices = parseWinCombo(winCombo) || [];
+    console.log('✅ Processed payline matrices from WinCombo (for sprites):', processedPaylineMatrices);
+
+    // For showing paylines, use the ENTIRE corresponding payline matrices
+    const winComboEntries = winCombo.split(':').filter(entry => entry.trim() !== '');
+    paylinesToShow = winComboEntries.map((_, index) => {
+      if (index < existingPaylineMatrices.length) {
+        console.log(`🎨 Using entire payline matrix ${index} for display:`, existingPaylineMatrices[index]);
+        return existingPaylineMatrices[index]; // Use entire payline for display
+      }
+      return [];
+    }).filter(payline => payline.length > 0);
+
+    console.log('🎨 Paylines to show (entire lines):', paylinesToShow);
+  } else if (existingPaylineMatrices.length > 0) {
+    // Fallback to existing payline matrices if no WinCombo
+    processedPaylineMatrices = existingPaylineMatrices;
+    paylinesToShow = existingPaylineMatrices;
+    console.log('📝 Using existing payline matrices (no WinCombo)');
+  }
+
+  // Create paylines for display using ENTIRE payline matrices
+  for(let i = 0; i < paylinesToShow.length; i++) {
+    console.log(paylinesToShow[i], 'entire payline matrix for display');
+    multiplePaylinesParams.push({positions:paylinesToShow[i], options: {...paylineOptions, color: colors[i%colors.length]}});
+  }
+
+  if (multiplePaylinesParams.length > 0) {
+    const payline = createMultiplePayline(multiplePaylinesParams);
+    gameContainer.gameArea.addChild(payline);
+    console.log(`🎨 Created ${multiplePaylinesParams.length} paylines for rendering`);
+  } else {
+    console.log('📝 No paylines to render');
+  }
+
+  // Convert winning positions to animated sprites using PROCESSED matrices (with count logic)
+  if (processedPaylineMatrices.length > 0) {
+    console.log('🎰 Converting winning positions from processed paylines (count logic applied)');
+    convertWinningPositionsToSprites(reelContainer, processedPaylineMatrices);
+  } else {
+    console.log('📝 No winning paylines to convert to sprites');
+  }
+
+  // NOW trigger reward and balance listeners after reels stopped and paylines are displayed
+  console.log('🎉 All reels stopped and paylines displayed - triggering reward and balance listeners');
+  GlobalState.triggerRewardListeners();
+  GlobalState.triggerBalanceListeners();
+
+  // Show big win popup if reward greater than 5 times the bet amount
+  const reward = GlobalState.getReward();
+  const betAmount = GlobalState.getStakeAmount();
+  if (reward > betAmount * 5) {
+    console.log('🎉 Big win detected - showing popup');
+    await ShowWinPopup(gameContainer.container.width, gameContainer.container.height, gameContainer.container, WIN_POPUP_TYPES.BIG_WIN, {
+      winAmount: reward,
+      isAutoSpin: isAutoSpin,
+      textStyle: {
+        fontFamily: 'Arial Black',
+        fontSize: 36,
+        fill: 0xFFD700, // Yellow/Gold color
+        fontWeight: 'bold',
+        stroke: 0x000000, // Black outline for better visibility
+        strokeThickness: 2
+      } as any,
+      spriteOptions: {
+        animationSpeed: 0.6, // Slightly faster animation for excitement
+        loop: true,
+        autoplay: true
+      }
+    });
+  }
+};
+
+/**
+ * Core stop functionality - immediately shows final results
+ * This is the modular function that can be called by both manual stop button and turbo mode
+ */
+export const executeStopReels = async (reelContainer: any, gameContainer: any, isAutoSpin: boolean = false): Promise<void> => {
+  console.log('🛑 Stop button clicked - cancelling active spin and showing results immediately');
+
+  try {
+    // Immediately disable the stop button to prevent multiple clicks
+    console.log('🔧 DEBUG: Disabling stop button immediately after click');
+    startSpin(); // This will disable all buttons including the stop button
+
+    // Cancel all active spin timeouts to prevent them from executing
+    cancelActiveSpin();
+
+    // Get final icons from server response
+    const finalIcons: string[][] = [];
+    for (let col = 0; col < TOTAL_REELS; col++) {
+      const columnIcons: string[] = [];
+      for (let row = 0; row < ICONS_PER_REEL; row++) {
+        const icon = GlobalState.getReelMatrix()[row][col];
+        columnIcons.push(slotIconMapping[icon]);
+      }
+      finalIcons.push(columnIcons);
+    }
+
+    // Immediately stop all reel animations and show final icons
+    stopReelAnimation({
+      reelContainer,
+      finalIcons,
+      pulseScale: 1.08,
+      pulseDuration: 600,
+      pulseDelay: 100
+    });
+
+    // Wait a brief moment for the reels to settle, then show results
+    setTimeout(async () => {
+      try {
+        await showFinalResults(reelContainer, gameContainer, isAutoSpin);
+
+        // Handle button state based on spin type
+        if (!isAutoSpin) {
+          // For manual spins: switch back to spin button and re-enable
+          switchStopToSpin();
+          endSpin();
+        } else {
+          // For auto spins: just call endSpin (which will keep buttons disabled during auto spin)
+          endSpin();
+        }
+
+        // Mark that the round is complete
+        GlobalState.setIsRoundInProgress(false);
+
+        console.log('🛑 Stop button handling complete');
+      } catch (error) {
+        console.error('Error in stop button final results:', error);
+        GlobalState.setIsRoundInProgress(false);
+
+        // Handle button state based on spin type for error cases
+        if (!isAutoSpin) {
+          switchStopToSpin();
+        }
+        endSpin();
+      }
+    }, 800); // Brief delay to let reels settle
+
+  } catch (error) {
+    console.error('Error in stopButtonClickHandler:', error);
+    GlobalState.setIsRoundInProgress(false);
+
+    // Handle button state based on spin type for error cases
+    if (!isAutoSpin) {
+      switchStopToSpin();
+    }
+    endSpin();
+  }
+};
+
+/**
+ * Stop button click handler - wrapper for the modular stop functionality
+ * Called when the stop button is clicked during spin animation
+ */
+export const stopButtonClickHandler = async (reelContainer: any, gameContainer: any, isAutoSpin: boolean = false): Promise<void> => {
+  console.log('🛑 Stop button clicked - calling modular stop function');
+  await executeStopReels(reelContainer, gameContainer, isAutoSpin);
+};
+
+export const spinClickHandler = async (reelContainer: any, gameContainer: any, isAutoSpin: boolean = false): Promise<void> => {
+  // Reset cancellation state for new spin
+  resetSpinCancellation();
+
+  // Mark that a round is in progress
+  GlobalState.setIsRoundInProgress(true);
+
+  // Disable autoSpin when manual spin is started (but not when started by auto button)
+  if (!isAutoSpin && GlobalState.getIsAutoSpin()) {
+    console.log('🔄 Manual spin detected - disabling autoSpin');
+    GlobalState.setIsAutoSpin(false);
+  }
+
+  return new Promise(async (resolve, reject) => {
+    try {
+      console.log(`${isAutoSpin ? 'Auto' : 'Manual'} spin started - starting reel animation`);
+
+      // Disable all buttons during spin
+      startSpin();
+
+      // Only switch to stop button for manual spins, not auto spins
+      if (!isAutoSpin) {
+        console.log('🔧 DEBUG: Manual spin - switching to stop button');
+        switchSpinToStop();
+      } else {
+        console.log('🔧 DEBUG: Auto spin - keeping spin button disabled without switching to stop');
+      }
+
+      console.log('🔧 DEBUG: startSpin() called, stop button logic applied based on spin type');
 
   // Clear previous paylines before starting new spin
   // console.log(`Before clearing: ${gameContainer.gameArea.children.length} children in gameArea`);
@@ -327,19 +546,54 @@ export const spinClickHandler = async (reelContainer: any, gameContainer: any, i
   // console.log(`After clearing: ${gameContainer.gameArea.children.length} children in gameArea`);
 
   // Stop any existing animation first
-  stopReelAnimation({ reelContainer });
+  // stopReelAnimation({ reelContainer });
 
-  // Start the animated reel spin with custom speed and duration
+  // Start the animated reel spin with sequential starting and easing
+  // Use different parameters for turbo mode to make it look faster
+  const isTurboMode = GlobalState.getIsTurboMode();
   animateReelSpin({
     reelContainer,
-    duration: 1300,
-    speed: 0.4 // 2.5x speed for faster spinning
+    duration: isTurboMode ? 300 : 1000, // Turbo: 0.5s, Normal: 1s duration for each reel
+    speed: isTurboMode ? 0.6 : 0.8, // Turbo: 2x speed, Normal: standard speed
+    delayBetweenReels: isTurboMode ? 30 : 100, // Turbo: 30ms delay, Normal: 100ms delay between reels
+    useEasing: true // Keep easing for smooth animation
   });
 
   // Call the websocket event for round start
   await sendRoundStartEvent();
 
-  const multiplePaylinesParams = [];
+  // Check if turbo mode is enabled - if so, immediately stop the reels
+  if (GlobalState.getIsTurboMode()) {
+    console.log('🚀 Turbo mode enabled - immediately stopping reels after server response');
+    await executeStopReels(reelContainer, gameContainer, isAutoSpin);
+
+    // For autospin with turbo, check if there are paylines and add delay if needed
+    if (isAutoSpin) {
+      const paylineMatrices = GlobalState.getPaylineMatrices();
+      const hasPaylines = paylineMatrices && paylineMatrices.length > 0;
+
+      if (hasPaylines) {
+        console.log('🚀 Turbo mode with autospin - paylines detected, showing for 2 seconds before continuing');
+        // Wait 2 seconds to show paylines before continuing autospin
+        setTimeout(() => {
+          console.log('🚀 Turbo mode payline display complete - resolving promise to continue autospin loop');
+          resolve();
+        }, 2000);
+      } else {
+        console.log('🚀 Turbo mode with autospin - no paylines, continuing immediately');
+        resolve();
+      }
+    }
+    return; // Exit early since turbo mode handles everything
+  }
+
+  // Enable stop button after successful server response (only for manual spins)
+  if (!isAutoSpin) {
+    console.log('🔧 DEBUG: Server responded successfully - enabling stop button for manual spin');
+    enableStopButton();
+  } else {
+    console.log('🔧 DEBUG: Server responded successfully - keeping spin button disabled during auto spin');
+  }
 
   // Store final icons for each reel column (5 reels, 4 icons each)
   const finalIcons: string[][] = [];
@@ -354,147 +608,103 @@ export const spinClickHandler = async (reelContainer: any, gameContainer: any, i
   }
 
     // After animation completes, stop reels sequentially from left to right
-    setTimeout(() => {
+    // Calculate timeout based on turbo mode:
+    // Normal: 1000ms duration + (5 reels * 100ms delay) = 1500ms
+    // Turbo: 500ms duration + (5 reels * 30ms delay) = 650ms
+    const animationTimeout = isTurboMode ? 650 : 1500;
+    const firstTimeout = setTimeout(() => {
+      // Check if spin was cancelled
+      if (isSpinCancelled) {
+        console.log('🛑 Spin was cancelled - skipping reel stop sequence');
+        return;
+      }
+
       try {
         console.log('Starting sequential reel stop - left to right');
-        // Stop reels sequentially with custom bounce settings
+        // Stop reels sequentially with smooth pulse effect
         stopReelAnimationSequential({
           reelContainer,
           finalIcons,
-          delayBetweenReels: 300,
-          bounceHeight: 70,
-          bounceDuration: 300,
-          bounceDelay: 30
+          delayBetweenReels: 200,
+          pulseScale: 1.08, // Slightly larger pulse for visual impact
+          pulseDuration: 300, // Longer, smoother pulse
+          pulseDelay: 100 // Slight delay before pulse starts
         });
 
         // After all reels have stopped (5 reels * 300ms delay = 1.5 seconds)
-        setTimeout(async () => {
+        const secondTimeout = setTimeout(async () => {
+          // Check if spin was cancelled
+          if (isSpinCancelled) {
+            console.log('🛑 Spin was cancelled - skipping final results');
+            return;
+          }
+
           try {
             console.log('All reels stopped - checking for wins');
 
-            // Get existing payline matrices and WinCombo
-            const existingPaylineMatrices = GlobalState.getPaylineMatrices() || [];
-            const winCombo = GlobalState.getWinCombo();
+            // Show final results (paylines and big wins)
+            await showFinalResults(reelContainer, gameContainer, isAutoSpin);
 
-            console.log('📊 Existing payline matrices:', existingPaylineMatrices);
-            console.log('🎯 WinCombo from server:', winCombo);
-
-            let processedPaylineMatrices: number[][][] = []; // For sprite conversion (with count logic)
-            let paylinesToShow: number[][][] = []; // For payline display (entire lines)
-
-            if (winCombo && winCombo.trim() !== '') {
-              // Parse WinCombo to get processed matrices (for sprite conversion with count logic)
-              processedPaylineMatrices = parseWinCombo(winCombo) || [];
-              console.log('✅ Processed payline matrices from WinCombo (for sprites):', processedPaylineMatrices);
-
-              // For showing paylines, use the ENTIRE corresponding payline matrices
-              const winComboEntries = winCombo.split(':').filter(entry => entry.trim() !== '');
-              paylinesToShow = winComboEntries.map((_, index) => {
-                if (index < existingPaylineMatrices.length) {
-                  console.log(`🎨 Using entire payline matrix ${index} for display:`, existingPaylineMatrices[index]);
-                  return existingPaylineMatrices[index]; // Use entire payline for display
-                }
-                return [];
-              }).filter(payline => payline.length > 0);
-
-              console.log('🎨 Paylines to show (entire lines):', paylinesToShow);
-            } else if (existingPaylineMatrices.length > 0) {
-              // Fallback to existing payline matrices if no WinCombo
-              processedPaylineMatrices = existingPaylineMatrices;
-              paylinesToShow = existingPaylineMatrices;
-              console.log('📝 Using existing payline matrices (no WinCombo)');
-            }
-
-            // Create paylines for display using ENTIRE payline matrices
-            for(let i = 0; i < paylinesToShow.length; i++) {
-              console.log(paylinesToShow[i], 'entire payline matrix for display');
-              multiplePaylinesParams.push({positions:paylinesToShow[i], options: {...paylineOptions, color: colors[i%colors.length]}});
-            }
-            console.log(winCombo, 'multiple winCombo')
-            console.log(multiplePaylinesParams, 'multiple paylines params')
-
-            if (multiplePaylinesParams.length > 0) {
-              const payline = createMultiplePayline(multiplePaylinesParams);
-              gameContainer.gameArea.addChild(payline);
-              console.log(`🎨 Created ${multiplePaylinesParams.length} paylines for rendering`);
+            // Handle button state based on spin type
+            if (!isAutoSpin) {
+              // For manual spins: switch back to spin button and re-enable
+              console.log('🔧 DEBUG: Manual spin complete - switching stop back to spin and enabling buttons');
+              switchStopToSpin();
+              endSpin();
             } else {
-              console.log('📝 No paylines to render');
+              // For auto spins: just call endSpin (which will keep buttons disabled during auto spin)
+              console.log('🔧 DEBUG: Auto spin complete - calling endSpin (buttons remain disabled during auto spin)');
+              endSpin();
             }
-
-            // Convert winning positions to animated sprites using PROCESSED matrices (with count logic)
-            if (processedPaylineMatrices.length > 0) {
-              console.log('🎰 Converting winning positions from processed paylines (count logic applied)');
-              convertWinningPositionsToSprites(reelContainer, processedPaylineMatrices);
-            } else {
-              console.log('📝 No winning paylines to convert to sprites');
-            }
-
-            // NOW trigger reward listeners after reels stopped and paylines are displayed
-            console.log('🎉 All reels stopped and paylines displayed - triggering reward listeners');
-            GlobalState.triggerRewardListeners();
-
-            // SHow big win popup if reward greater than 5 times the bet amount
-            const reward = GlobalState.getReward();
-            const betAmount = GlobalState.getStakeAmount();
-            if (reward > betAmount * 5) {
-              console.log('🎉 Big win detected - showing popup');
-              await ShowWinPopup(gameContainer.container.width, gameContainer.container.height, gameContainer.container, WIN_POPUP_TYPES.BIG_WIN, {
-                winAmount: reward,
-                isAutoSpin: isAutoSpin,
-                textStyle: {
-                  fontFamily: 'Arial Black',
-                  fontSize: 36,
-                  fill: 0xFFD700, // Yellow/Gold color
-                  fontWeight: 'bold',
-                  stroke: 0x000000, // Black outline for better visibility
-                  strokeThickness: 2
-                } as any,
-                spriteOptions: {
-                  animationSpeed: 0.6, // Slightly faster animation for excitement
-                  loop: true,
-                  autoplay: true
-                }
-              });
-            }
-
-            // Re-enable all buttons after spin completes
-            console.log('🔧 DEBUG: About to call endSpin()');
-            endSpin();
-            console.log('🔧 DEBUG: endSpin() called');
 
             // Mark that the round is complete
             GlobalState.setIsRoundInProgress(false);
-
-            // Here you can add logic to:
-            // 1. Check for winning combinations
-            // 2. Show win popup if needed
-            // 3. Update balance, etc.
-
-            // Example: Show win popup (uncomment if needed)
-            // const parentContainer = gameContainer.container || gameContainer;
-            // ShowWinPopup(parentContainer, WIN_POPUP_TYPES.TOTAL_WIN, 100);
 
             // Resolve the promise to indicate the round is complete
             resolve();
           } catch (error) {
             console.error('Error in final spin completion:', error);
             GlobalState.setIsRoundInProgress(false);
+
+            // Handle button state based on spin type for error cases
+            if (!isAutoSpin) {
+              switchStopToSpin();
+            }
             endSpin();
             reject(error);
           }
-        }, 2000); // Wait for all reels to stop
+        }, 1500); // Wait for all reels to stop
+
+        // Track the second timeout
+        activeSpinTimeouts.push(secondTimeout);
+
       } catch (error) {
         console.error('Error in reel stop sequence:', error);
         GlobalState.setIsRoundInProgress(false);
+
+        // Handle button state based on spin type for error cases
+        if (!isAutoSpin) {
+          switchStopToSpin();
+        }
         endSpin();
         reject(error);
       }
-    }, 1000);
+    }, animationTimeout); // Dynamic timeout based on turbo mode
+
+    // Track the first timeout
+    activeSpinTimeouts.push(firstTimeout);
 
     } catch (error) {
       console.error('Error in spinClickHandler:', error);
       // Ensure round in progress flag is reset even on error
       GlobalState.setIsRoundInProgress(false);
+
+      // Handle button state based on spin type for error cases
+      if (!isAutoSpin) {
+        // For manual spins, ensure we switch back from stop to spin button
+        switchStopToSpin();
+      }
+
       // Re-enable buttons on error
       endSpin();
       reject(error); // Reject the promise with the error

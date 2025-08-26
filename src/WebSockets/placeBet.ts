@@ -14,7 +14,11 @@ export const sendPlaceBetEvent = async () => {
         // Only set game started on successful bet placement and remove win modal if in case it exists
         GlobalState.setReward(0);
         GlobalState.setGameStarted(true);
+
+        // Store balance but trigger listeners immediately for bet placement (balance decreases)
         GlobalState.setBalance(res.balance);
+        console.log(`💳 Balance updated after bet placement: ${res.balance}`);
+
         GlobalState.setResultString(res.winCombo);
         GlobalState.setReelMatrix(res.matrix);
         GlobalState.setWinCombo(res.winCombo);

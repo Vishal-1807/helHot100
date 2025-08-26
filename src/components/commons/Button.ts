@@ -65,7 +65,7 @@ export function createButton(options: ButtonOptions = {}): Container {
     anchor = { x: 0.5, y: 0.5 },
     bold = false,
     italic = false,
-    shadow = true, // Default shadow to true
+    shadow = false, // Default shadow to true
     tint = '#ffffff',
   } = options;
 

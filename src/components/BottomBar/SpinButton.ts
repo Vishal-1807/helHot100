@@ -3,14 +3,15 @@ import { createButton } from '../commons';
 import { UI_POS } from '../constants/Positions';
 import { SoundManager } from '../../utils/SoundManager';
 import { ActivityTypes, recordUserActivity } from '../../utils/gameActivityManager';
-import { spinClickHandler } from '../Logic/spinClickHandler';
+import { spinClickHandler, stopButtonClickHandler } from '../Logic/spinClickHandler';
+import { GlobalState } from '../../globals/gameState';
 
 export const createSpinButton = (appWidth: number, appHeight: number, gameContainer: any, reelContainer: any): Container => {
   const container = new Container();
   container.zIndex = 50;
 
   let spinButtonRef: any;
-  let multiplePayline: any;
+  let isStopButton = false; // Track current button state
 
   const spinButton = createButton({
     x: appWidth * UI_POS.SPIN_BUTTON_X,
@@ -20,49 +21,32 @@ export const createSpinButton = (appWidth: number, appHeight: number, gameContai
     borderRadius: 10,
     texture: Assets.get('spinButton'),
     onClick: async () => {
-      await spinClickHandler(reelContainer, gameContainer, false);
-      console.log('Spin button clicked - starting reel animation');
-      // -------- payline example --------- //
-      // multiplePayline = createMultiplePayline([
-      //   {
-      //     positions: [[0,0], [2,1], [1,2], [2,3], [0,4]],
-      //     options: {
-      //       color: 0x800080, // purple
-      //       width: 3,
-      //       alpha: 1,
-      //       glow: true,
-      //       glowBlur: 10,
-      //       glowColor: 0xFF4444, // Lighter red glow
-      //       pulse: true,
-      //       pulseDuration: 1.0,
-      //       pulseMinAlpha: 0.3,
-      //       pulseMaxAlpha: 1.0,
-      //       extensionLength: appWidth * 0.05,
-      //       // offset: 0 // Manual offset: no offset for first payline
-      //     }
-      //   },
-      //   {
-      //     positions: [[1,0], [2,1], [1,2], [2,3], [0,4]],
-      //     options: {
-      //       color: 0x00ff00, // green
-      //       width: 3,
-      //       alpha: 1,
-      //       glow: true,
-      //       glowBlur: 10,
-      //       glowColor: 0xFF4444, // Darker black glow
-      //       pulse: true,
-      //       pulseDuration: 1.0,
-      //       pulseMinAlpha: 0.3,
-      //       pulseMaxAlpha: 1.0,
-      //       extensionLength: appWidth * 0.05,
-      //       // offset: 5 // Manual offset: 5px below the first payline
-      //     }
-      //   }
-      // ], 8); // Default offset step (used if offset not specified)
-	    // gameContainer.gameArea.addChild(multiplePayline);  
+      // Check if auto spin is active - if so, ignore manual clicks
+      const isAutoSpinActive = GlobalState.getIsAutoSpin();
+      if (isAutoSpinActive) {
+        console.log('🔄 Auto spin is active - ignoring manual spin/stop button click');
+        return;
+      }
+
+      if (isStopButton) {
+        // Handle stop button click (only for manual spins)
+        console.log('Stop button clicked - disabling button and showing results');
+
+        // Immediately disable the button to prevent multiple clicks
+        if (spinButton && typeof (spinButton as any).setDisabled === 'function') {
+          (spinButton as any).setDisabled(true);
+        }
+
+        await stopButtonClickHandler(reelContainer, gameContainer, false);
+        recordUserActivity(ActivityTypes.BUTTON_CLICK, { buttonName: 'stopButton' });
+      } else {
+        // Handle spin button click (manual spin only)
+        console.log('Spin button clicked - starting reel animation');
+        await spinClickHandler(reelContainer, gameContainer, false);
+        recordUserActivity(ActivityTypes.BUTTON_CLICK, { buttonName: 'spinButton' });
+      }
 
       SoundManager.playUIClick();
-      recordUserActivity(ActivityTypes.BUTTON_CLICK, { buttonName: 'spinButton' });
     },
   });
   spinButtonRef = spinButton;
@@ -94,6 +78,30 @@ export const createSpinButton = (appWidth: number, appHeight: number, gameContai
       return (spinButton as any).getDisabled();
     }
     return false;
+  };
+
+  // Expose texture switching methods for spin-to-stop functionality
+  (container as any).switchToStop = () => {
+    if (spinButton && typeof (spinButton as any).setTexture === 'function') {
+      (spinButton as any).setTexture(Assets.get('stopButton'));
+      isStopButton = true;
+      console.log('🔄 Spin button switched to stop button texture');
+    }
+  };
+
+  (container as any).switchToSpin = () => {
+    if (spinButton && typeof (spinButton as any).setTexture === 'function') {
+      (spinButton as any).setTexture(Assets.get('spinButton'));
+      isStopButton = false;
+      console.log('🔄 Stop button switched back to spin button texture');
+    }
+  };
+
+  // Expose setTexture method for external control
+  (container as any).setTexture = (texture: any) => {
+    if (spinButton && typeof (spinButton as any).setTexture === 'function') {
+      (spinButton as any).setTexture(texture);
+    }
   };
 
   return container;

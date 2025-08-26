@@ -10,39 +10,41 @@ export interface AnimateReelSpinParams {
   duration?: number;
   speed?: number; // Speed multiplier (1 = normal, 2 = double speed, 0.5 = half speed)
   finalIcons?: string[][];
+  delayBetweenReels?: number; // Delay in milliseconds between starting each reel (default: 200ms)
+  useEasing?: boolean; // Whether to use easing (slow start, speed up, slow down) (default: true)
 }
 
 export interface StopSingleReelParams {
   reelColumnContainer: any;
   columnIndex: number;
   finalIcons?: string[];
-  bounceHeight?: number;
-  bounceDuration?: number;
-  bounceDelay?: number;
+  pulseScale?: number; // Scale multiplier for pulse effect (default: 1.1)
+  pulseDuration?: number; // Duration of pulse animation (default: 400ms)
+  pulseDelay?: number; // Delay before pulse starts (default: 50ms)
 }
 
 export interface StopReelAnimationSequentialParams {
   reelContainer: any;
   finalIcons?: string[][];
   delayBetweenReels?: number;
-  bounceHeight?: number;
-  bounceDuration?: number; // bounceDuration controls how long the entire bounce animation takes to complete for each individual icon.
-  bounceDelay?: number; // bounceDelay is the initial delay before the bounce animation starts after the reel stops and final icons are placed.
+  pulseScale?: number; // Scale multiplier for pulse effect (default: 1.1)
+  pulseDuration?: number; // Duration of pulse animation (default: 400ms)
+  pulseDelay?: number; // Delay before pulse starts (default: 50ms)
 }
 
 export interface StopReelAnimationParams {
   reelContainer: any;
   finalIcons?: string[][];
-  bounceHeight?: number;
-  bounceDuration?: number; // bounceDuration controls how long the entire bounce animation takes to complete for each individual icon.
-  bounceDelay?: number; // bounceDelay is the initial delay before the bounce animation starts after the reel stops and final icons are placed.
+  pulseScale?: number; // Scale multiplier for pulse effect (default: 1.1)
+  pulseDuration?: number; // Duration of pulse animation (default: 400ms)
+  pulseDelay?: number; // Delay before pulse starts (default: 50ms)
 }
 
-export interface BounceEffectParams {
+export interface PulseEffectParams {
   slotIcons: any[];
-  bounceHeight?: number;
-  duration?: number;
-  delayBetweenIcons?: number;
+  pulseScale?: number; // Scale multiplier (default: 1.1)
+  duration?: number; // Duration of pulse animation (default: 400ms)
+  delayBetweenIcons?: number; // Delay between each icon's pulse (default: 50ms)
 }
 
 // Animation state tracking
@@ -56,12 +58,27 @@ const animationStates = new Map<any, {
 export const animateReelSpin = (params: AnimateReelSpinParams) => {
   const {
     reelContainer,
-    duration = 3000,
+    duration = 400,
     speed = 1,
-    finalIcons
+    finalIcons,
+    delayBetweenReels = 250, // Increased default delay for more noticeable sequential effect
+    useEasing = true
   } = params;
 
+  // Start each reel sequentially from left to right
   reelContainer.children.forEach((reelColumnContainer: any, columnIndex: number) => {
+    // Calculate delay for this reel (left to right)
+    const startDelay = columnIndex * delayBetweenReels;
+
+    // Start this reel's animation after the calculated delay
+    setTimeout(() => {
+      animateSingleReel(reelColumnContainer, columnIndex, duration, speed, useEasing);
+    }, startDelay);
+  });
+};
+
+// Helper function to animate a single reel with easing
+const animateSingleReel = (reelColumnContainer: any, columnIndex: number, duration: number, speed: number, useEasing: boolean) => {
     // Stop any existing animation and clean up first
     const existingState = animationStates.get(reelColumnContainer);
     if (existingState) {
@@ -143,9 +160,15 @@ export const animateReelSpin = (params: AnimateReelSpinParams) => {
       icon.mask = mask;
     });
 
-    // Animation speed (pixels per frame) - now controlled by speed parameter
+    // Animation speed and easing setup
     const baseAnimationSpeed = (reelColumnButton.height + ICON_HEIGHT * 2) / (duration / 40); // 60fps
-    const animationSpeed = baseAnimationSpeed * speed; // Apply speed multiplier
+    let currentSpeed = baseAnimationSpeed * speed; // Apply speed multiplier
+
+    // Easing variables - improved for more pronounced effect
+    let animationStartTime = Date.now();
+    const easingDuration = duration;
+    const minSpeedMultiplier = 0.8; // Start much slower (30% of normal speed)
+    const maxSpeedMultiplier = 2.0; // Higher peak speed (200% of normal speed)
 
     // Create resize function for animated icons
     const resizeAnimatedIcons = () => {
@@ -193,10 +216,26 @@ export const animateReelSpin = (params: AnimateReelSpinParams) => {
       resizeFunction: () => resizeAnimatedIcons()
     });
 
-    // Animation loop
+    // Animation loop with easing
     const animate = () => {
       const state = animationStates.get(reelColumnContainer);
       if (!state || !state.isAnimating) return;
+
+      // Calculate easing if enabled
+      let animationSpeed = currentSpeed;
+      if (useEasing) {
+        const elapsed = Date.now() - animationStartTime;
+        const progress = Math.min(elapsed / easingDuration, 1);
+
+        // Easing function: slow start, speed up, then slow down (ease-in-out-cubic)
+        const easeInOutCubic = (t: number) => {
+          return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        };
+
+        const easedProgress = easeInOutCubic(progress);
+        const speedMultiplier = minSpeedMultiplier + (maxSpeedMultiplier - minSpeedMultiplier) * easedProgress;
+        animationSpeed = baseAnimationSpeed * speed * speedMultiplier;
+      }
 
       // Get current bounds for boundary checking
       const currentLocalBounds = reelColumnButton.getLocalBounds();
@@ -252,54 +291,56 @@ export const animateReelSpin = (params: AnimateReelSpinParams) => {
         state.resizeFunction(newWidth, newHeight);
       }
     };
-  });
 };
 
-// Function to animate bounce effect on final icons
-const animateBounceEffect = (params: BounceEffectParams) => {
+// Function to animate smooth pulse effect on final icons
+const animatePulseEffect = (params: PulseEffectParams) => {
   const {
     slotIcons,
-    bounceHeight = 10,
-    duration = 300,
+    pulseScale = 1.1,
+    duration = 400,
     delayBetweenIcons = 50
   } = params;
 
   if (!slotIcons || slotIcons.length === 0) return;
 
   slotIcons.forEach((icon: any, index: number) => {
-    if (!icon || typeof icon.getPosition !== 'function') return;
+    if (!icon || typeof icon.setSize !== 'function') return;
 
-    const originalPosition = (icon as any).getPosition();
+    const originalSize = (icon as any).getSize();
     const startTime = Date.now();
 
-    const bounce = () => {
+    const pulse = () => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
 
-      // Easing function for bounce effect (ease-out-back)
-      const easeOutBack = (t: number) => {
-        const c1 = 1.70158;
-        const c3 = c1 + 1;
-        return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+      // Ultra-smooth easing function for pulse (ease-in-out-sine)
+      const easeInOutSine = (t: number) => {
+        return -(Math.cos(Math.PI * t) - 1) / 2;
       };
 
-      // Apply bounce offset (negative to go up, then settle down)
-      const bounceOffset = bounceHeight * (1 - easeOutBack(progress));
-      const newY = originalPosition.y - bounceOffset;
+      const easedProgress = easeInOutSine(progress);
 
-      (icon as any).setPosition(originalPosition.x, newY);
+      // Create a smooth pulse using sine wave for natural scaling
+      const pulseProgress = Math.sin(easedProgress * Math.PI); // Creates smooth 0->1->0 curve
+      const scaleMultiplier = 1 + (pulseScale - 1) * pulseProgress;
+
+      const newWidth = originalSize.width * scaleMultiplier;
+      const newHeight = originalSize.height * scaleMultiplier;
+
+      (icon as any).setSize(newWidth, newHeight);
 
       if (progress < 1) {
-        requestAnimationFrame(bounce);
+        requestAnimationFrame(pulse);
       } else {
-        // Ensure final position is exactly the original position
-        (icon as any).setPosition(originalPosition.x, originalPosition.y);
+        // Ensure final size is exactly the original size
+        (icon as any).setSize(originalSize.width, originalSize.height);
       }
     };
 
-    // Start bounce animation with a slight delay for each icon to create a wave effect
+    // Start pulse animation with a slight delay for each icon to create a wave effect
     setTimeout(() => {
-      requestAnimationFrame(bounce);
+      requestAnimationFrame(pulse);
     }, index * delayBetweenIcons);
   });
 };
@@ -310,9 +351,9 @@ export const stopSingleReel = (params: StopSingleReelParams) => {
     reelColumnContainer,
     columnIndex,
     finalIcons,
-    bounceHeight = 50,
-    bounceDuration = 400,
-    bounceDelay = 50
+    pulseScale = 1.1,
+    pulseDuration = 400,
+    pulseDelay = 50
   } = params;
 
   const state = animationStates.get(reelColumnContainer);
@@ -356,15 +397,15 @@ export const stopSingleReel = (params: StopSingleReelParams) => {
     const reelColumnButton = reelColumnContainer.children[0];
     const { slotIcons, resizeSlotIcons } = addSlotIcons(reelColumnButton, reelColumnContainer, columnIndex, finalIcons, true);
 
-    // Add bounce effect to the final icons
+    // Add pulse effect to the final icons
     setTimeout(() => {
-      animateBounceEffect({
+      animatePulseEffect({
         slotIcons,
-        bounceHeight,
-        duration: bounceDuration,
+        pulseScale,
+        duration: pulseDuration,
         delayBetweenIcons: 50
       });
-    }, bounceDelay);
+    }, pulseDelay);
 
     const originalResize = (reelColumnContainer as any).originalResize || reelColumnContainer.resize;
 
@@ -387,9 +428,9 @@ export const stopReelAnimationSequential = (params: StopReelAnimationSequentialP
     reelContainer,
     finalIcons,
     delayBetweenReels = 500,
-    bounceHeight = 50,
-    bounceDuration = 400,
-    bounceDelay = 50
+    pulseScale = 1.1,
+    pulseDuration = 400,
+    pulseDelay = 50
   } = params;
 
   reelContainer.children.forEach((reelColumnContainer: any, columnIndex: number) => {
@@ -399,9 +440,9 @@ export const stopReelAnimationSequential = (params: StopReelAnimationSequentialP
         reelColumnContainer,
         columnIndex,
         finalIcons: columnFinalIcons,
-        bounceHeight,
-        bounceDuration,
-        bounceDelay
+        pulseScale,
+        pulseDuration,
+        pulseDelay
       });
     }, columnIndex * delayBetweenReels);
   });
@@ -412,9 +453,9 @@ export const stopReelAnimation = (params: StopReelAnimationParams) => {
   const {
     reelContainer,
     finalIcons,
-    bounceHeight = 50,
-    bounceDuration = 400,
-    bounceDelay = 50
+    pulseScale = 1.1,
+    pulseDuration = 400,
+    pulseDelay = 50
   } = params;
 
   reelContainer.children.forEach((reelColumnContainer: any, columnIndex: number) => {
@@ -423,9 +464,9 @@ export const stopReelAnimation = (params: StopReelAnimationParams) => {
       reelColumnContainer,
       columnIndex,
       finalIcons: columnFinalIcons,
-      bounceHeight,
-      bounceDuration,
-      bounceDelay
+      pulseScale,
+      pulseDuration,
+      pulseDelay
     });
   });
 };

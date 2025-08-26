@@ -19,7 +19,11 @@ export const sendRoundStartEvent = async () => {
       if (res?.status === '200 OK') {
         GlobalState.setReward(0);
         GlobalState.setRoundId(res.roundId);
+
+        // Update balance immediately for round start (if needed)
         GlobalState.setBalance(res.balance);
+        console.log(`💳 Balance updated at round start: ${res.balance}`);
+
         console.log('✅ Round started successfully, now placing bet...', res);
 
         try {
